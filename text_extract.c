@@ -34,10 +34,10 @@ Uint32 getpixel(SDL_Surface *surface, int x, int y)
 
 int text_extract(SDL_Surface *image)
 {
-   unsigned long *r;
-   unsigned long *g;
-   unsigned long *b;
-   int min;
+   int *r;
+   int *g;
+   int *b;
+   int min = INT32_MAX;
    int width = image->w;
    int height = image->h;
    for (int i = 0; i < height; i++)
@@ -48,10 +48,39 @@ int text_extract(SDL_Surface *image)
            Uint32 pixel = getpixel(image, i, j);
            SDL_UnlockSurface(image);
            SDL_GetRGB(pixel, image->format, *r, *g, *b);
+           int a = *r;
+           int d = *g; 
+           int c = *b;
+           if (a != 255 && d != 255 && c != 255)
+           {
+               if (j < min)
+               {
+                   min = j;
+               }
+           }
            
        }
        
-   }
+    }
+
+    SDL_Rect *srcrect;
+    srcrect->x = min;
+    srcrect->y = 0;
+    srcrect->h = height;
+    srcrect->w = width - min;
+
+    SDL_Rect *dstrect;
+    dstrect->x = 0;
+    dstrect->y = 0;
+    dstrect->h = height;
+    dstrect->w = srcrect->w;
+
+    SDL_Surface *dst_image;
+
+    SDL_BlitSurface(image,srcrect,dst_image,dstrect);
+
+    SDL_SaveBMP(dst_image, "/home/sofiane/Documents/OCR PROJECT/OCR/");
+
    
 
 }
