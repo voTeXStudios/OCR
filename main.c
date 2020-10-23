@@ -5,6 +5,7 @@
 #include<stdlib.h>
 #include<stdbool.h>
 #include<err.h>
+#include"text_extract.h"
 
 //Initialize the SDL
 void init_SDL()
@@ -54,12 +55,15 @@ SDL_Surface* display_image(SDL_Surface *img)
 
 int main(int argc, char **argv)
 {
+   
 
     //the path  of the image we want to display
     char* imagePath = argv[1];
     bool displaying = true;
     SDL_Event _event ;
     SDL_Surface *screen, *image;
+    SDL_Surface *s;
+    //int** array;
 
     
     
@@ -75,7 +79,13 @@ int main(int argc, char **argv)
         
     init_SDL();
     image = load_image(imagePath);
-    screen = display_image(image);
+    //int min = text_extract(image);
+    //printf("%u", min);
+
+
+    s = ImageFormation(image);
+
+    screen = display_image(s);
 
 
 
@@ -90,14 +100,15 @@ int main(int argc, char **argv)
                 break;
             
             default:
-                SDL_BlitSurface(image, 0, screen, 0);
-                SDL_UpdateRect(screen, 0, 0, image->w, image->h);
+                SDL_BlitSurface(s, 0, screen, 0);
+                SDL_UpdateRect(screen, 0, 0, s->w, s->h);
                 break;
         }
     }
 
     SDL_FreeSurface(image);
     SDL_FreeSurface(screen);
+    SDL_FreeSurface(s);
 
     return 0;
     
