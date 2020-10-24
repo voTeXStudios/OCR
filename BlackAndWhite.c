@@ -15,14 +15,16 @@ void GrayScale()
     Uint8 r, g, b;
     int height = image->h;
     int width = image->w;
+    Uint8 avg;
+    Uint32 pixel;
 
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
         {
-            Uint32 pixel = get_pixel(image, j, i);
+            pixel = get_pixel(image, j, i);
             SDL_GetRGB(pixel, image->format, &r, &g, &b);
-            Uint8 avg = (Uint8)(0.3*(double)r + 0.59*(double)g + 0.11*(double)b);
+            avg = 0.3*r + 0.59*g + 0.11*b;
             r = avg;
             g = avg;
             b = avg;
