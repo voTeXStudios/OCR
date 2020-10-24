@@ -42,6 +42,7 @@ void GrayScale()
 void Binarise(SDL_Surface *img)
 {
     image = img;
+    Uint32 pixel;
     GrayScale();
     Uint8 r, g, b;
     int height = image->h;
@@ -51,10 +52,10 @@ void Binarise(SDL_Surface *img)
     {
         for (int j = 0; j < width; j++)
         {
-            Uint32 pixel = get_pixel(image, j, i);
+            pixel = get_pixel(image, j, i);
             SDL_GetRGB(pixel, image->format, &r, &g, &b);
-            Uint8 avg = (r+g+b)/3;
-            if (avg<126)
+
+            if (r<126)  //r = (r+g+b)/3   since r=g=b 
             {
                 r = 0;
                 g = 0;
