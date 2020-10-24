@@ -72,9 +72,10 @@ int CalcMinFromLeft(SDL_Surface *image)
 
 }
 
-SDL_Surface* ImageFormation(SDL_Surface *img, int min)
+SDL_Surface* ImageFormation(SDL_Surface *img)
 {   
     Uint8 r, g, b;
+    int min = text_extract(img);
     SDL_Surface *Newimage;
     int width = img->w;
     int height = img->h;
@@ -100,53 +101,6 @@ SDL_Surface* ImageFormation(SDL_Surface *img, int min)
     SDL_SaveBMP(Newimage, "res.bmp");
 }
 
-int CalcMinFromTop(SDL_Surface *image)
-{
-	Uint8 r, g, b;
-	int min = INT8_MAX;
-	int width = image->w;
-	int height = image->h;
-	for(int i = 0; i <= width; i++)
-	{
-		for(int j = 0; j <= height; j++)
-		{
-			Uint8 pixel = get_pixel(image, i, j);
-			SDL_GetRGB(pixel, image->format, &r, &g, &b);
-			if (r == 0 && g == 0 && b == 0)
-			{
-				if (j < min)
-				{
-					min = j;
-				}
-			}
-		}
-	}
-  return min;
-}
-
-int CalcMinFromBot(SDL_Surface *image)
-{
-	Uint8 r, g, b;
-	int min = INT8_MAX;
-	int width = image->w;
-	int height = image->h;
-	for(int i = 0; i <= width; i++)
-	{
-		for(int j = height; j >= 0; j--)
-		{
-			Uint8 pixel = get_pixel(image, i, j);
-			SDL_GetRGB(pixel, image->format, &r, &g, &b);
-			if (r == 0 && g == 0 && b == 0)
-			{
-				if (height - j < min)
-				{
-					min = height - j;
-				}
-			}
-		}
-	}
-return min;
-}
 
 
 
