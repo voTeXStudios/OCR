@@ -120,7 +120,6 @@ void binarization(SDL_Surface* image_surface, float limit)
     Uint8 r, g, b;
     Uint32 pixel;
     grayscale(image_surface);
-    gaussian_blurring(image_surface,FilterCreation);
 
     int threshold = automatic_threshold_value(image_surface,limit);
     for (int x = 0; x < width; x++)

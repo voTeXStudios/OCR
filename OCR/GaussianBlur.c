@@ -48,7 +48,7 @@ void gaussian_blurring(SDL_Surface* image_surface, double kernal[3][3]){  //inte
     int height = image_surface->h;
     FilterCreation();
     double sum = 0;
-    Uint8 r1, g1, b1, newcolor;
+    Uint8 r1, g1, b1;
     Uint32 pixel;
     SDL_Surface* image_surface_copy = image_surface;
     
