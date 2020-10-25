@@ -62,18 +62,18 @@ float mean_value(SDL_Surface* image_surface)  // image here has been grayscaled
 
 
 
-int automatic_threshold_value(SDL_Surface* image_surface, float limit)  // image here has been grayscaled
+float automatic_threshold_value(SDL_Surface* image_surface, float limit)  // image here has been grayscaled
 {
 
-    float old_thre = 0;
+    float old_thre=0;
     float new_thre = mean_value(image_surface);
     int width = image_surface->w;
     int height = image_surface->h;
     Uint32 pixel;
     Uint8 r, g, b;
-    int count1, count2, total1, total2;
+    float count1, count2, total1, total2;
 
-    while(old_thre - new_thre > limit || old_thre - new_thre < -limit)
+    while(old_thre - new_thre >= limit || old_thre - new_thre <= -limit)
     {
         old_thre = new_thre;
         count1 = count2 = total1 = total2 = 0;
@@ -94,20 +94,25 @@ int automatic_threshold_value(SDL_Surface* image_surface, float limit)  // image
 
             }
 
-            new_thre = ((total1/count1)+(total2/count2))/2;
-
 
             }
         }
+        new_thre = ((total1/count1)+(total2/count2))/2.;
 
     }
-    return new_thre;
+    return old_thre;
 }
 
 /*   The limit mentioned below is user definable. A larger limit will allow 
 a greater difference between successive threshold values. 
 Advantages of this can be quicker execution but with a less clear boundary 
-between background and foreground. */
+between background and foreground. I found 10 is a pretty good value. anything below 1 is redundant (0.5 if rounding issue is fixed).
+The lower the limit the more background noise is reduced but letters get more constricted. If image is not uniform in lighting or background
+algorithm will still work but not as well.
+
+
+I wanted to round numbers in the end but was having issues compiling therefore the threshold of 120.86 will truncate to 120 instead of
+rounding up :l */
 
 void binarization(SDL_Surface* image_surface, float limit)
 {
