@@ -7,12 +7,17 @@
 #include <time.h>
 #include "neuronX.c"
 
+/* This funtion is used to retrieve the information of a specific neuron.
+   Mostly used for debugging*/
 
 void printinfo(Neuron * N)
 {
   printf("weight1 = %f, weight2 = %f\n", N -> weights[0], N -> weights[1]);
   printf("output for N = %f\n", N -> output);
 }
+
+/* This funtion is used to simulate the feed forward process in a network using only 3 neurons.
+   Used to check outputs and to train*/
 
 double PseudoFeedForward(Neuron * N1, Neuron * N2, Neuron * N3, double inputs[])
 {
@@ -23,6 +28,9 @@ double PseudoFeedForward(Neuron * N1, Neuron * N2, Neuron * N3, double inputs[])
   output2 = ProcessNeuron(output1, N3);
   return output2;
 }
+
+/* This funtion is used to simulate the back propogation process in a network using only 3 neurons.
+   Used to train*/
 
 void PseudoBackProp(Neuron * N1, Neuron * N2, Neuron * N3, double guess, double target, double inputs[])
 {
@@ -53,6 +61,9 @@ void PseudoBackProp(Neuron * N1, Neuron * N2, Neuron * N3, double guess, double 
 
 }
 
+/* This funtion is used to train the network of 3 neurons
+   Used to change guesses of the network to desired outputs*/
+
 void PseudoTrain(Neuron * N1, Neuron * N2, Neuron * N3, int iterations, double inputs[], double target)
 {
   double res;
@@ -64,6 +75,24 @@ void PseudoTrain(Neuron * N1, Neuron * N2, Neuron * N3, int iterations, double i
   }
 }
 
+/* This funtion is used to display the progress of the network after several interations of training.
+   Used to check progress made by the network*/
+
+void DisplayProgress(Neuron * N1, Neuron * N2, Neuron * N3, int iterations, double inputs[], double target)
+{
+  double res;
+  res = PseudoFeedForward(N1, N2, N3, inputs);
+
+  printf("output for {%d,%d} before training = %f\n", (int)inputs[0], (int)inputs[1], res);
+  printf("Training...\n");
+
+  PseudoTrain(N1, N2, N3, iterations, inputs, target);
+
+  res = PseudoFeedForward(N1, N2, N3, inputs);
+
+  printf("output for {%d,%d} after training = %f\n\n", (int)inputs[0], (int)inputs[1], res);
+}
+
 int main()
 {
   srand(time(NULL));
@@ -71,43 +100,26 @@ int main()
   double targets[4] = {0,1,1,0};
   double res;
 
-  Neuron N1, A1, B1, C1, D1 = GenerateNeuron();
-  Neuron N2, A2, B2, C2, D2 = GenerateNeuron();
-  Neuron N3, A3, B3, C3, D3 = GenerateNeuron();
+  Neuron N1 = GenerateNeuron();
+  Neuron N2 = GenerateNeuron();
+  Neuron N3 = GenerateNeuron();
+  Neuron A1 = N1;
+  Neuron B1 = N1;
+  Neuron C1 = N1;
+  Neuron D1 = N1;
+  Neuron A2 = N2;
+  Neuron B2 = N2;
+  Neuron C2 = N2;
+  Neuron D2 = N2;
+  Neuron A3 = N3;
+  Neuron B3 = N3;
+  Neuron C3 = N3;
+  Neuron D3 = N3;
 
-  printinfo(&N1);
-  printinfo(&N2);
-
-  res = PseudoFeedForward(&N1, &N2, &N3, inputs[1]);
-
-  printinfo(&N1);
-  printinfo(&N2);
-
-  printf("output for {0,1} before training = %f\n", res);
-  printf("Training...\n");
-
-  PseudoTrain(&N1, &N2, &N3, 10000, inputs[1], targets[1]);
-
-  res = PseudoFeedForward(&N1, &N2, &N3, inputs[1]);
-
-  printf("output for {0,1} after training = %f\n", res);
-
-  /*printf("output for {0,0} before training = %f\n", res);
-
-  res = PseudoFeedForward(&N1, &N2, &N3, inputs[0]);
-  printf("Training...\n");
-
-  resfor1 = PseudoTrain(N1, N2, N3, 10000, inputs[0], targets[0]);
-
-  res = PseudoFeedForward(&N1, &N2, &N3, inputs[0]);
-
-  printf("output for {0,0} after training = %f\n", res);
-
-  printf("Testing\n");
-
-  res = PseudoFeedForward(&N1, &N2, &N3, inputs[1]);
-
-  printf("output for {0,1} after training = %f\n", res);*/
+  DisplayProgress(&A1, &A2, &A3, 100000, inputs[0], targets[0]);
+  DisplayProgress(&B1, &B2, &B3, 100000, inputs[1], targets[1]);
+  DisplayProgress(&C1, &C2, &C3, 100000, inputs[2], targets[2]);
+  DisplayProgress(&D1, &D2, &D3, 100000, inputs[3], targets[3]);
 
   return 0;
 }
