@@ -6,6 +6,7 @@
 #include "pixeloperations.h"
 #include<err.h>
 #include "BlackAndWhite.h"
+#include "GaussianBlur.h"
 
 
 void grayscale(SDL_Surface* image_surface)
@@ -91,10 +92,7 @@ float automatic_threshold_value(SDL_Surface* image_surface, float limit)  // ima
             else{
                 count2++;
                 total2 += r;
-
-            }
-
-
+                }
             }
         }
         new_thre = ((total1/count1)+(total2/count2))/2.;
@@ -122,6 +120,8 @@ void binarization(SDL_Surface* image_surface, float limit)
     Uint8 r, g, b;
     Uint32 pixel;
     grayscale(image_surface);
+    gaussian_blurring(image_surface,FilterCreation);
+
     int threshold = automatic_threshold_value(image_surface,limit);
     for (int x = 0; x < width; x++)
     {
@@ -147,3 +147,5 @@ void binarization(SDL_Surface* image_surface, float limit)
 
 
 }
+
+
