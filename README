@@ -1,0 +1,14 @@
+README for the 1st Defense.
+
+Enjoy!!
+
+#When the user will type {make} on the command line. It will create two executable file, "Network" and "main". 
+
+Network:-
+
+
+
+
+
+Line Segmentation:-
+It needs two inputs for now. One is to show character detection and the other is to show character splitting. Although character splitting isnt fully functional yet, so it will be better to give a one line text image as the 2nd argument. User can give any text image as the input for the 1st argument as it basically shows the character detection.
