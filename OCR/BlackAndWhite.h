@@ -4,7 +4,7 @@
 #include<stdlib.h>
 #include"SDL/SDL.h"
 
-void GrayScale();
-void Binarise(SDL_Surface *img);
+void grayScale();
+void binarise(SDL_Surface* image_surface, float limit);
 
 #endif
