@@ -8,7 +8,7 @@
 
 struct Network
 {
-  Layer layers[4];
+  Layer layers[2];
   double *output;
 };
 
@@ -100,7 +100,7 @@ int main()
 
   Network XOR = GenerateNetworkXOR();
 
-  for (size_t k = 0; k < 4 ; k++)
+  for (size_t k = 0; k < 2 ; k++)
   {
     printf("layer%ld\n", k);
     for (size_t i = 0; i < XOR.layers[k].nb_outputs; i++)
