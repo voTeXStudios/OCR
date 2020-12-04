@@ -134,8 +134,7 @@ void convolute(SDL_Surface* image_surface, double m[], size_t cols){
     }
     for (size_t i = 0; i < width; i++)
     {
-        pixel = get_pixel(image_surface,i,0);
-        pixel = SDL_MapRGB(image_surface->format, 255, 255, 255);
+        pixel = SDL_MapRGB(image_surface->format, 255, 255, 255)
         pixel = get_pixel(image_surface,i,height-1);
         pixel = SDL_MapRGB(image_surface->format, 255, 255, 255)
     }
