@@ -6,24 +6,60 @@
 #include "CropImage.h"
 #include<err.h>
 
+// A potential Image bug fix
+SDL_Surface* IncreaseTheSizeImage(SDL_Surface* image)
+{
+    Uint8 r, g, b;
+    Uint32 pixel;
+    SDL_Surface* newImage;
+    int height = image->h;
+    int width = image->w;
+    int new_Width = width + 10;
+    int new_height = height + 10;
+    newImage = SDL_CreateRGBSurface(0, new_Width, new_height, 32, 0, 0, 0, 0);
+    SDL_FillRect(newImage, NULL, SDL_MapRGB(newImage->format, 255, 255, 255));
+
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            pixel = get_pixel(image, j, i);
+            SDL_GetRGB(pixel, image->format, &r, &g, &b);
+            pixel = SDL_MapRGB(newImage->format, r, g, b);
+            put_pixel(newImage, j+5, i+5, pixel);
+        }
+        
+    }
+    return newImage;
+}
+
 
 int CalcMinFromLeft(SDL_Surface *image)
 {
    
    Uint8 r, g, b;
-   int min = INT8_MAX;
+   Uint32 pixel;
+   int min = INT32_MAX;
    int width = image->w;
    int height = image->h;
    for (int i = 0; i < height; i++)
    {
        for (int j = 0; j < width; j++)
        {
-           Uint32 pixel = get_pixel(image, j, i);
+           pixel = get_pixel(image, j, i);
            SDL_GetRGB(pixel, image->format, &r, &g, &b);
-           if (r != 255 && g != 255 && b != 255)
+           if (r == 0 && g == 0 && b == 0)
            {
                if (j < min)
-                    min = j-1;
+               {
+                    if (j - 3 >= 0)
+                        min = j - 3;
+                    else
+                        min = j;
+                    
+                    break;
+               }
+                    
                
            }
            
@@ -37,19 +73,28 @@ int CalcMinFromLeft(SDL_Surface *image)
 int CalcMinFromRight(SDL_Surface *image)
 {
     Uint8 r, g, b;
-    int min = INT8_MIN;
+    Uint32 pixel;
+    int min = INT32_MIN;
     int width = image->w;
     int height = image->h;
     for (int i = 0; i < height; i++)
     {   
         for (int j = width - 1; j >= 0; j--)
         {
-            Uint32 pixel = get_pixel(image, j, i);
+            pixel = get_pixel(image, j, i);
             SDL_GetRGB(pixel, image->format, &r, &g, &b);
-            if (r != 255 && g != 255 && b  != 255)
+            if (r == 0 && g == 0 && b  == 0)
             {
                 if (j>min)
-                    min = j+1;
+                {
+                    if(j + 3 < width)
+                        min = j + 3;
+                    
+                    else
+                        min = j;
+                    
+                    break;
+                }    
             }
         }
         
@@ -60,20 +105,27 @@ int CalcMinFromRight(SDL_Surface *image)
 int CalcMinFromTop(SDL_Surface *image)
 {
 	Uint8 r, g, b;
-	int min = INT8_MAX;
+    Uint32 pixel;
+	int min = INT32_MAX;
 	int width = image->w;
 	int height = image->h;
 	for(int i = 0; i < width; i++)
 	{
 		for(int j = 0; j <  height; j++)
 		{
-			Uint8 pixel = get_pixel(image, i, j);
+			pixel = get_pixel(image, i, j);
 			SDL_GetRGB(pixel, image->format, &r, &g, &b);
-			if (r != 255 && g != 255 && b != 255)
+			if (r == 0 && g == 0 && b == 0)
 			{
 				if (j < min)
 				{
-					min = j-1;
+                    if (j - 3 >= 0)
+                        min = j - 3;
+                    
+                    else
+                        min = j;
+                    
+                    break;
 				}
 			}
 		}
@@ -84,20 +136,27 @@ int CalcMinFromTop(SDL_Surface *image)
 int CalcMinFromBot(SDL_Surface *image)
 {
 	Uint8 r, g, b;
-	int min = INT8_MIN;
+    Uint32 pixel;
+	int min = INT32_MIN;
 	int width = image->w;
 	int height = image->h;
 	for(int i = 0; i < width; i++)
 	{
 		for(int j = height-1; j >= 0; j--)
 		{
-			Uint8 pixel = get_pixel(image, i, j);
+			pixel = get_pixel(image, i, j);
 			SDL_GetRGB(pixel, image->format, &r, &g, &b);
-			if (r != 255 && g != 255 && b != 255)
+			if (r == 0 && g == 0 && b == 0)
 			{
 				if (j>min)
 				{
-					min = j+1;
+                    if (j + 3 < height)
+                        min = j + 3;   /* code */
+                    
+                    else
+                        min = j;
+                    
+                    break;
 				}
 			}
 		}
@@ -105,122 +164,51 @@ int CalcMinFromBot(SDL_Surface *image)
     return min;
 }
 
-SDL_Surface* CropLeft(SDL_Surface *img)
-{   
-    Uint8 r, g, b;
-    SDL_Surface *Newimage;
-    int min = CalcMinFromLeft(img);
-    int width = img->w;
-    int height = img->h;
-    width -= min;
-    Newimage = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
-    SDL_FillRect(Newimage, NULL, SDL_MapRGB(Newimage->format, 255, 255, 255));
 
-    
 
-    for (int i = 0; i < height ; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            
-            Uint32 pixel = get_pixel(img, j+min, i);
-            SDL_GetRGB(pixel, img->format, &r, &g, &b);
-            pixel = SDL_MapRGB(Newimage->format, r, g, b);
-            put_pixel(Newimage, j, i, pixel);
-            
-        }
-               
-    }
-    
-    return Newimage;
-}
 
-SDL_Surface* CropRight(SDL_Surface *img)
+SDL_Surface* Crop(SDL_Surface* img)
 {
     Uint8 r, g, b;
-    SDL_Surface *NewImage;
-    int min = CalcMinFromRight(img);
-    //int width = img->w;
-    int height = img->h;
-    NewImage = SDL_CreateRGBSurface(0, min, height, 32, 0, 0, 0, 0);
-    SDL_FillRect(NewImage, NULL, SDL_MapRGB(NewImage->format, 255, 255, 255));
+    Uint32 pixel;
+    SDL_Surface* newImage;
+    int mintop = CalcMinFromTop(img);
+    int minBot = CalcMinFromBot(img);
+    int minLeft = CalcMinFromLeft(img);
+    int minRight = CalcMinFromRight(img);
+    int newImageX;
+    int newImageY = 0;
+    newImage = SDL_CreateRGBSurface(0, minRight-minLeft, minBot-mintop, 32, 0, 0, 0, 0);
+    SDL_FillRect(newImage, NULL, SDL_MapRGB(newImage->format, 255, 255, 255));
 
-    for (int i = 0; i < height; i++)
-    {
-        for (int j = 0; j < min; j++)
+
+    for (int i = mintop; i < minBot; i++)
+    {   
+        newImageX = 0;
+        for (int j = minLeft; j < minRight; j++)
         {
-            Uint32 pixel = get_pixel(img, j, i);
+            pixel = get_pixel(img, j, i);
             SDL_GetRGB(pixel, img->format, &r, &g, &b);
-            pixel = SDL_MapRGB(NewImage->format, r, g, b);
-            put_pixel(NewImage, j, i, pixel);
+            pixel = SDL_MapRGB(newImage->format, r, g, b);
+            put_pixel(newImage, newImageX, newImageY, pixel);
+            newImageX += 1;
         }
-        
-    
+        newImageY += 1;
     }
-    return NewImage;
-    
-}
-
-SDL_Surface* CropTop(SDL_Surface *img)
-{
-    Uint8 r, g, b;
-    SDL_Surface *NewImage;
-    int min = CalcMinFromTop(img);
-    int width = img->w;
-    int height = img->h;
-    height -= min;
-    NewImage = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
-    SDL_FillRect(NewImage, NULL, SDL_MapRGB(NewImage->format, 255, 255, 255));
-
-    for (int i = 0; i < height; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            Uint32 pixel = get_pixel(img, j, i+min);
-            SDL_GetRGB(pixel, img->format, &r, &g, &b);
-            pixel = SDL_MapRGB(NewImage->format, r, g, b);
-            put_pixel(NewImage, j, i, pixel);
-        }
-        
-    }
-    return NewImage;
+    return newImage;
 }
 
 
-SDL_Surface* CropBottom(SDL_Surface *img)
-{
-    Uint8 r, g, b;
-    SDL_Surface *NewImage;
-    int min = CalcMinFromBot(img);
-    int width = img->w;
-    NewImage = SDL_CreateRGBSurface(0, width, min, 32, 0, 0, 0, 0);
-    SDL_FillRect(NewImage, NULL, SDL_MapRGB(NewImage->format, 255, 255, 255));
 
-    for (int i = 0; i < min; i++)
-    {
-        for (int j = 0; j < width; j++)
-        {
-            Uint32 pixel = get_pixel(img, j, i);
-            SDL_GetRGB(pixel, img->format, &r, &g, &b);
-            pixel = SDL_MapRGB(NewImage->format, r, g, b);
-            put_pixel(NewImage, j, i, pixel);
-        }
-        
-    }
-    return NewImage;
-    
-}
+
 
 SDL_Surface* ChipTheEdges(SDL_Surface *img)
 {
     SDL_Surface* s;
+    s = IncreaseTheSizeImage(img);
+    s = Crop(s);
 
-    s = CropLeft(img);
-    s = CropRight(s);
-    s = CropTop(s);
-    s = CropBottom(s);
-
-    SDL_SaveBMP(s, "Images/CroppedImage.bmp");
+   // SDL_SaveBMP(s, "Images/CroppedImage.bmp");
     return s;
 
 }
