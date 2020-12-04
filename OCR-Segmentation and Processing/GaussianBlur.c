@@ -131,7 +131,7 @@ bool IsValid(int x, int y, int height, int width)
         return false;
 }
 
-void Convolute(SDL_Surface *image_surface, double m[], int cols)
+void convolute_tp(SDL_Surface *image_surface, double m[], int cols)
 {
     int width = image_surface->w;
     int height = image_surface->h;
@@ -183,9 +183,10 @@ void convolute(SDL_Surface* image_surface, double m[], size_t cols){
     size_t width = image_surface->w;
     size_t height = image_surface->h;
     double sum;
-    Uint8 r1=0, g1=0, b1=0;
+
+    Uint8 r,g,b;
     Uint32 pixel;
-    SDL_Surface *image_surface_copy = SDL_CreateRGBSurface(image_surface-> flags, width, height, image_surface->format->BitsPerPixel,image_surface->format->Rmask, image_surface->format->Gmask, image_surface->format->Bmask, image_surface->format->Amask);
+    SDL_Surface *image_surface_copy = SDL_CreateRGBSurface(image_surface-> flags, image_surface->w, image_surface->h, image_surface->format->BitsPerPixel,image_surface->format->Rmask, image_surface->format->Gmask, image_surface->format->Bmask, image_surface->format->Amask);
     SDL_BlitSurface(image_surface, NULL, image_surface_copy,NULL);
     for (size_t i = 1; i < height-1; i++)
     {
@@ -194,12 +195,12 @@ void convolute(SDL_Surface* image_surface, double m[], size_t cols){
             sum = 0;
             for (int x = -1; x <= 1; x++)
             {
-		   // printf("%ld",x);
                 for (int y = -1; y <= 1; y++)
                 {
                     pixel = get_pixel(image_surface_copy,y+j,x+i);
-                    SDL_GetRGB(pixel, image_surface_copy->format, &r1, &g1, &b1);
-                    sum += (r1 * m[(x+1)*cols + y+1]);
+		    SDL_GetRGB(pixel, image_surface_copy->format, &r, &g, &b);
+		    sum += (r * m[(x+1)*cols + y+1]);
+		   
                 }
             }
 	        pixel = SDL_MapRGB(image_surface->format, sum, sum, sum);
@@ -207,21 +208,20 @@ void convolute(SDL_Surface* image_surface, double m[], size_t cols){
         }
     }
 
-    /*for (size_t i = 0; i < width; i++)
+    for (size_t i = 0; i < width; i++)
     {
-        pixel = get_pixel(image_surface,i,0);
+ 
         pixel = SDL_MapRGB(image_surface->format, 255, 255, 255);
-        pixel = get_pixel(image_surface,i,height-1);
-        pixel = SDL_MapRGB(image_surface->format, 255, 255, 255);
+	put_pixel(image_surface,i,0,pixel);
+        put_pixel(image_surface,i,height-1,pixel);
     }
     
     for (size_t i = 0; i < height; i++)
     {
-        pixel = get_pixel(image_surface,0,i);
-        pixel = SDL_MapRGB(image_surface->format, 255, 255, 255);
-        pixel = get_pixel(image_surface,width-1,i);
-        pixel = SDL_MapRGB(image_surface->format, 255, 255, 255);
-    }*/
+	pixel = SDL_MapRGB(image_surface->format, 255, 255, 255);
+        put_pixel(image_surface,0,i,pixel);
+        put_pixel(image_surface,width-1,i,pixel);
+    }
     //possibility to crop image, with white contour this won't matter though
     
 }

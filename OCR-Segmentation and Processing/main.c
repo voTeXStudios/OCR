@@ -103,9 +103,9 @@ int main(int argc, char **argv)
     char* imagePath = argv[1];
     SDL_Surface *screen;
     SDL_Surface *image;
-    SDL_Surface *s;
+   // SDL_Surface *s;
 
-    SDL_Surface** surfaces;
+   // SDL_Surface** surfaces;
 
     
     
@@ -128,23 +128,27 @@ int main(int argc, char **argv)
     {
         image = Compression(image, 1000, 1000);
     }
-   // screen = displayImage(image);
-    // wait_for_keypressed();
+
+   // screen = SDL_SetVideoMode(image->w, image->h, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
+
+    
+    screen = displayImage(image);
+    wait_for_keypressed();
 
     grayScale(image);
-    //update_surface(screen, image);
-    //wait_for_keypressed();
+    update_surface(screen, image);
+    wait_for_keypressed();
 
     Convolution(image);
-    //update_surface(screen, image);
-    //wait_for_keypressed();
+    update_surface(screen, image);
+    wait_for_keypressed();
 
     Binarise(image);
-   // Convolution(image);
-    //update_surface(screen, image);
-    //wait_for_keypressed();
+    update_surface(screen, image);
+    wait_for_keypressed();
     
     //Crop the unwanted portion of the image.
+    /*
     s = ChipTheEdges(image);
 
     screen = displayImage(s);
@@ -162,7 +166,7 @@ int main(int argc, char **argv)
 
     //printf("%i", NbCharacters());
 
-  
+  */
 
 
    
@@ -175,9 +179,9 @@ int main(int argc, char **argv)
     
     
    
-    free(surfaces);   
+   // free(surfaces);   
     SDL_FreeSurface(screen);
-    SDL_FreeSurface(s);
+   // SDL_FreeSurface(s);
     SDL_FreeSurface(image);
   
 
