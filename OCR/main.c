@@ -9,7 +9,7 @@
 #include"CharDetection.h"
 #include"BlackAndWhite.h"
 #include"pixeloperations.h"
-#include"LetterSegregate.h"
+#include"GaussianBlur.h"
 
 //Initialize the SDL
 void init_SDL()
@@ -82,97 +82,107 @@ void wait_for_keypressed()
 
 
 
-
+void SaveImages(SDL_Surface** surfaces)
+{
+    int i = 0;
+    while (*(surfaces + i) != NULL)
+    {
+        char number_str[100];
+        sprintf(number_str, "%d", i);
+        strcat(number_str, "res.bmp");
+        SDL_SaveBMP(*(surfaces + i), number_str);
+        i++; 
+    }
+}
 
 
 int main(int argc, char **argv)
 {
    
 
-    //the path  of the image we want to display
     char* imagePath = argv[1];
-    char* image2Path = argv[2];
-    //bool displaying = true;
-    //SDL_Event _event ;
     SDL_Surface *screen;
     SDL_Surface *image;
     SDL_Surface *s;
-    SDL_Surface *image2;
+
+    SDL_Surface** surfaces;
 
     
     
     
     
-   /* if (argc == 1)
+   
+    if (argc != 2)
     {
-        errx(1, "Error: No path provided");
-        return 1; 
-    }*/
-
-    if (argc != 3)
-    {
-        errx(1, "Error: Two Images Required. One is to demonstrate how characters are being detected, and the other one to show splitting of characters. Character splitting isnt quite fully functional yet, so it's better if a line of text is chosen. For example {Images/UBer.bmp} or {Images/r.bmp}");
+        errx(1, "One Image required");
         return 1;
     }
        
-        
+    //Initialise SDL.    
     init_SDL();
+
+    //Load the required image.
     image = load_image(imagePath);
-    image2 = load_image(image2Path);
+
+    if (image->h > 2000 && image->w > 2000)
+    {
+        image = Compression(image, 1000, 1000);
+    }
+   // screen = displayImage(image);
+    // wait_for_keypressed();
+
+    grayScale(image);
+    //update_surface(screen, image);
+    //wait_for_keypressed();
+
+    Convolution(image);
+    //update_surface(screen, image);
+    //wait_for_keypressed();
 
     Binarise(image);
-    Binarise(image2);
-    Boundry(image);
-
-    Vertical_segmentation(image2);
+   // Convolution(image);
+    //update_surface(screen, image);
+    //wait_for_keypressed();
     
-    DetectCharacter(image);
-    screen = displayImage(image);
-    wait_for_keypressed();
-    SDL_FreeSurface(image);
-
-    
-    
-    
+    //Crop the unwanted portion of the image.
     s = ChipTheEdges(image);
-    screen = displayImage(s);
-    wait_for_keypressed();
 
+    screen = displayImage(s);
+
+
+    //Detect the characters.
+    surfaces = DetectCharacter(s);
+
+
+    //Save Images in files
+    SaveImages(surfaces);
+
+    
+    
+
+    //printf("%i", NbCharacters());
+
+  
+
+
+   
+    wait_for_keypressed();
+    
+   
+    
+
+    
+    
+    
+   
+    free(surfaces);   
+    SDL_FreeSurface(screen);
     SDL_FreeSurface(s);
     SDL_FreeSurface(image);
-    SDL_FreeSurface(screen);
-    SDL_FreeSurface(image2);
+  
 
     
 
     return 0;
-    
-
-
-
-    //A loop to keep on displaying till the time a key is not pressed
-
-    /*while ((SDL_WaitEvent(&_event) != 0) && (displaying))
-    {
-        switch (_event.type)
-        {
-            case SDL_KEYUP:
-                displaying = false;
-                break;
-            
-            default:
-                SDL_BlitSurface(s, 0, screen, 0);
-                SDL_UpdateRect(screen, 0, 0, s->w, s->h);
-                break;
-        }
-    }*/
-
-   // SDL_FreeSurface(s);
-    
-    
-    
-   
-
-   
     
 }

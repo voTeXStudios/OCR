@@ -9,23 +9,19 @@
 
 
 #include "pixeloperations.h"
-#include "CropImage.h"
 #include "CharDetection.h"
 
 
-SDL_Surface *image;
-int minLeft;
-int minRight;
-int minTop;
-int minBot;
+SDL_Surface** surfaces;
+int Char;
 
-
-//Drawing a horizontal Line to seperate lines of the texts
-void DrawHorLine(int i)
+// NOT NEEDED 
+// Drawing a horizontal Line to seperate lines of the texts
+void DrawHorLine(SDL_Surface *image, int i)
 {
     Uint32 pixel;
     int width = image->w;
-    for (int j = minLeft; j <= minRight; j++)
+    for (int j = 0; j < width; j++)
     {
         pixel = SDL_MapRGB(image->format, 255, 0, 0);
         put_pixel(image, j, i, pixel);
@@ -35,7 +31,7 @@ void DrawHorLine(int i)
 
 
 //Drawing vertical lines to seperate characters of the text
-void DrawVerLine(int x, int start, int end)
+void DrawVerLine(SDL_Surface *image, int x, int start, int end)
 {
     Uint32 pixel;
 
@@ -48,135 +44,207 @@ void DrawVerLine(int x, int start, int end)
 
 }
 
-
-
-void CharacterLineFormation(int start, int end)
+// Segment the characters and store them
+void CharSeg(SDL_Surface *image, int h1, int h2, int start, int end)
 {
     Uint8 r, g, b;
+    SDL_Surface *newImage;
+    Uint32 pixel;
+    int xCor;
+    int yCor = 0;
+
+    newImage = SDL_CreateRGBSurface(0, end-start, h2-h1, 32, 0, 0, 0, 0);
+    SDL_FillRect(newImage, NULL, SDL_MapRGB(newImage->format, 255, 255, 255));
+
+    for (int i = h1; i < h2; i++)
+    {
+        xCor = 0;
+        for (int j = start; j < end; j++)
+        {
+            pixel = get_pixel(image, j, i);
+            SDL_GetRGB(pixel, image->format, &r, &g, &b);
+            pixel = SDL_MapRGB(newImage->format, r, g, b);
+            put_pixel(newImage, xCor, yCor, pixel);
+            xCor += 1;
+        }
+        yCor += 1;
+
+    }
+    *(surfaces + Char) = newImage;
+    Char += 1;
+    //printf("%p        %i\n", &*(surfaces + Char), Char);
+    //printf("%s saved\n", number_str);
+    //SDL_FreeSurface(newImage);
+
+}
+
+
+// Finds Characters 
+void FindCharacters(SDL_Surface *image, int start, int end)
+{
+    Uint8 r, g, b;
+    Uint32 pixel;
     int width = image->w;
     int height = end;
-    Uint32 pixel;
-    bool hasBlack;
-    bool check = false;
-    int y = minLeft;
+    bool metBlack = false;
+    bool metWhiterow;
+    int y = 0;
 
-    for (int i = minLeft; i <= minRight; i++)
+    for (int i = 0; i < width; i++)
     {
-        hasBlack = false;
-        for (int j = start; j <= height; j++)
+        metWhiterow = true;
+        for (int j = start; j < height; j++)
         {
             pixel = get_pixel(image, i, j);
             SDL_GetRGB(pixel, image->format, &r, &g, &b);
             if (r == 0 && g == 0 && b  == 0)
             {
-                hasBlack = true;
-                check = true;
-                y = i;
+                metWhiterow = false;
+                if (!metBlack)
+                {
+                    metBlack = true;
+                    //DrawVerLine(image, i, start, end);
+                    y = i;
+                }
             }   
         }
-        if (!hasBlack && check)
+        if (metWhiterow && metBlack)
         {
-            check = false;
-            DrawVerLine(y, start, end);
+            metBlack = false;
+            CharSeg(image, start, end, y, i);
+            //DrawVerLine(image, i, start, end);
         }
         
     }
-    
 }
 
 
-/*void LineSegregation( int start, int end, int nb)
+
+
+
+// Isolates lines
+void FindLineBlock(SDL_Surface *img)
 {
     Uint8 r, g, b;
-    int width = image->w;
-    int height = end - start;
-    SDL_Surface* LineImage;
-    LineImage = SDL_CreateRGBSurface(0, width, height, 32, 0, 0, 0, 0);
-    SDL_FillRect(LineImage, NULL, SDL_MapRGB(LineImage->format, 255, 255, 255));
-
-    printf("ImageFormation has Started\n");
-    for (int i = start; i < end ; i++)
-    {
-        for (int j = 0 ; j < width; j++)
-        {
-            Uint32 pixel = get_pixel(image, j, i);
-            SDL_GetRGB(pixel, image->format, &r, &g, &b);
-            pixel = SDL_MapRGB(LineImage->format, r, g, b);
-            put_pixel(LineImage, j, i, pixel);
-        }
-           
-    }
-
-    //SDL_FreeSurface(LineImage);
-    printf("PictureFormed\n");
-    /*char str[20];
-    char src[20] = "Lines";
-    sprintf(str, "%u", nb);
-    strcat(src, str);
-    strcat(src, ".bmp");
-    SDL_SaveBMP(LineImage, src);
-    
-}*/
-
-
-
-void CharacterDetection(SDL_Surface *img)
-{
-    image = img;
-    Uint8 r, g, b;
-    int width = image->w;
-    int height = image->h;
-    bool hasBlack;
-    bool check = false;
     Uint32 pixel;
-
-    int y = minTop;
-    int h = minTop;
+    int width = img->w;
+    int height = img->h;
+    bool metBlack = false;
+    bool metWhiterow;
+    int start = 0;
     
 
 
-    for (int i = minTop; i <= minBot; i++)
+    for (int i = 0; i < height; i++)
     {
-
-        hasBlack = false;
-        for (int j = minLeft; j <= minRight; j++)
+        metWhiterow = true;
+        for (int j = 0; j < width; j++)
         {
-            pixel = get_pixel(image, j, i);
-			SDL_GetRGB(pixel, image->format, &r, &g, &b);
+            pixel = get_pixel(img, j, i);
+			SDL_GetRGB(pixel, img->format, &r, &g, &b);
             if (r == 0 && g == 0 && b == 0)
             {
-                hasBlack = true;
-                check = true;
-                y = i;
+                metWhiterow = false;
+                if (!metBlack)
+                {
+                    metBlack = true;
+                   // DrawHorLine(img, i);
+                    start = i;
+                }
             }
 
         }
-        if (!hasBlack && check)
+        if (metWhiterow && metBlack)
         {
-            check = false;
-            y += 1;
-            DrawHorLine(y);
-            CharacterLineFormation(h, y);
-            h = y;
-           
+            metBlack = false;
+           // DrawHorLine(img, i);
+            FindCharacters(img, start, i);
         }
         
     }
-    
-    
 }
 
 
 
-//CharacterDetection
-
-void DetectCharacter(SDL_Surface *img)
+// For compression of the image
+SDL_Surface* Compression(SDL_Surface* img, int x, int y)
 {
-    minLeft = CalcMinFromLeft(img);
-    minRight = CalcMinFromRight(img);
-    minTop = CalcMinFromTop(img);
-    minBot = CalcMinFromBot(img);
-    CharacterDetection(img);
+    Uint8 r, g, b;
+    Uint32 pixel;
+    SDL_Surface *CompressedImage;
+    int height = img->h;
+    int width = img->w;
+    float ratioX = (float) width / x;
+    float ratioY = (float) height / y;
+
+    CompressedImage = SDL_CreateRGBSurface(0, x, y, 32, 0, 0, 0, 0);
+    SDL_FillRect(CompressedImage, NULL, SDL_MapRGB(CompressedImage->format, 255, 255, 255));
+
+    for (int i = 0; i < y; i++)
+    {
+        for (int j = 0; j < x; j++)
+        {
+            pixel = get_pixel(img, (int)(j * ratioX),(int)(i * ratioY));
+            SDL_GetRGB(pixel, img->format, &r, &g, &b);
+            pixel = SDL_MapRGB(CompressedImage->format, r, g, b);
+            put_pixel(CompressedImage, j, i, pixel);
+
+
+        }
+    }
+    return CompressedImage;
+
 }
 
+
+
+
+/// Wapper function //////
+/* Returns the array of Character images with Compression */
+SDL_Surface** DetectCharacter(SDL_Surface *img)
+{
+    int size = img->w;
+    printf("%i\n", size);
+    Char = 0;
+    surfaces = (SDL_Surface**)malloc(size * sizeof(SDL_Surface*));
+    SDL_Surface *cImages;
+    
+    if (surfaces == NULL)
+    {
+        printf("Could not allocate memory. Sorry!\n");
+        exit(-1);
+    }
+
+
+    // Initialise the array with NULL
+    for (int i = 0; i < size; i++)
+        *(surfaces + i) = NULL;
+
+
+    
+    
+    // Function that stores the Character Images in the global array.
+    FindLineBlock(img);
+
+
+
+    // Compress the images in that array.
+    int i = 0;
+    while (*(surfaces + i) != NULL)
+    {
+        cImages = *(surfaces + i);
+        *(surfaces + i) = Compression(cImages, 28, 28);
+        i++;
+    }
+    
+    return surfaces;
+}
+
+
+
+
+int NbCharacters()
+{
+    return Char;
+}
 
