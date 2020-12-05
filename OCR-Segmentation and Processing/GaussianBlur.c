@@ -187,6 +187,7 @@ void convolute(SDL_Surface* image_surface, double m[], size_t cols){
     Uint8 r,g,b;
     Uint32 pixel;
     SDL_Surface *image_surface_copy = SDL_CreateRGBSurface(image_surface-> flags, image_surface->w, image_surface->h, image_surface->format->BitsPerPixel,image_surface->format->Rmask, image_surface->format->Gmask, image_surface->format->Bmask, image_surface->format->Amask);
+    
     SDL_BlitSurface(image_surface, NULL, image_surface_copy,NULL);
     for (size_t i = 1; i < height-1; i++)
     {
@@ -197,8 +198,8 @@ void convolute(SDL_Surface* image_surface, double m[], size_t cols){
             {
                 for (int y = -1; y <= 1; y++)
                 {
-                    pixel = get_pixel(image_surface_copy,y+j,x+i);
-		    SDL_GetRGB(pixel, image_surface_copy->format, &r, &g, &b);
+                    pixel = get_pixel(image_surface,y+j,x+i);
+		    SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
 		    sum += (r * m[(x+1)*cols + y+1]);
 		   
                 }
@@ -207,6 +208,7 @@ void convolute(SDL_Surface* image_surface, double m[], size_t cols){
             put_pixel(image_surface,j,i,pixel);
         }
     }
+    SDL_FreeSurface(image_surface_copy);
 
     for (size_t i = 0; i < width; i++)
     {
