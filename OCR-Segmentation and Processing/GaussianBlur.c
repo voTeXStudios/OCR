@@ -222,7 +222,7 @@ void convolute(SDL_Surface* image_surface, double m[], size_t cols){
         put_pixel(image_surface,0,i,pixel);
         put_pixel(image_surface,width-1,i,pixel);
     }
-    //possibility to crop image, with white contour this won't matter though
+    //possibility to crop image, with white contour. Done above^^.
     
 }
 
