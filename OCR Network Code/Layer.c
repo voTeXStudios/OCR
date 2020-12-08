@@ -17,12 +17,12 @@ struct Layer
 
 typedef struct Layer Layer;
 
-Layer GenerateLayer(double nb_neurons, double nb_inputs)
+Layer GenerateLayer(double nb_neurons, double nb_inputs) // nb_neurons = 549 nb_inputs = 784
 {
   Layer l;
   l.nb_outputs = nb_neurons;
   l.neurons = calloc(nb_neurons, sizeof(Neuron));
-  Neuron * begin = l.neurons;
+  Neuron* begin = l.neurons;
   for (size_t i = 0 ; i < nb_neurons; i++)
   {
     begin[i] = GenerateNeuron(nb_inputs);
@@ -30,7 +30,7 @@ Layer GenerateLayer(double nb_neurons, double nb_inputs)
   return l;
 }
 
-double * ProcessLayer(double *input, Layer *l, double nb_inputs)
+double* ProcessLayer(double *input, Layer *l, double nb_inputs)
 {
 	l -> output = calloc(l -> nb_outputs, sizeof(double));
 	double *begin = l -> output;
