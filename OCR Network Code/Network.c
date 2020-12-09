@@ -10,18 +10,18 @@
 
 struct Network
 {
-  Layer layers[2];
+  Layer layers[3];
   double *output;
 };
 
+//Declarations
 typedef struct Network Network;
-
 double* FeedForwardXOR(double* input, Network net);
 
 Network GenerateNetwork()
 {
-  double nb_neurons[3] = {549, 392, 26};
-  double nb_inputs[3] = {784, 549, 392};
+  double nb_neurons[3] = {200, 100, 26};
+  double nb_inputs[3] = {784, 200, 100};
   Network net;
   for (size_t i = 0; i < 3; i++)
   {
@@ -31,10 +31,11 @@ Network GenerateNetwork()
   return net;
 }
 
-void BackPropagation(Network net, double guess, double target, double inputs[])
+void BackPropagationXOR(Network net, double target, double inputs[])
 {
   double error;
   double dl_dw;
+  Neuron neuron;
   //double dl_daL_1;
   //Layer layer = net.layers[];
   int k = 1;
@@ -42,29 +43,29 @@ void BackPropagation(Network net, double guess, double target, double inputs[])
   {
     for (int i = 0; i < net.layers[k].nb_outputs; i++)
     {
-      Neuron* neuron = &net.layers[k].neurons[i];
+      neuron = net.layers[k].neurons[i];
       //printf("Neuron Visited %i\n", i);
-      for (int j = 0; j < neuron -> nb_weights; j++)
+      for (int j = 0; j < neuron.nb_weights; j++)
       {
         //printf("k: %i\n", k);
         if (k == 1)
         {
-          error = -(target - neuron -> output); 
+          error = -(target - neuron.output); 
 
-          dl_dw = error * activation_derivative(guess) * net.layers[k - 1].neurons[j].output;
+          dl_dw = error * sigmoid_derivative(neuron.output) * net.layers[k - 1].neurons[j].output;
 
-          net.layers[k - 1].neurons[j].dl_wrt_curr = neuron -> weights[j] * activation_derivative(guess) * error;
+          net.layers[k - 1].neurons[j].dl_wrt_curr += neuron.weights[j] * sigmoid_derivative(neuron.output) * error;
           //printf("dl_wrt_prevneuron: %f\n", net.layers[k-1].neurons[j].dl_wrt_curr);
 
-          neuron -> weights[j] = neuron -> weights[j] - 0.6 * dl_dw;
+          neuron.weights[j] = neuron.weights[j] - 0.6 * dl_dw;
           //printf("%f\n", neuron -> weights[j]);
         }
         else
         {
          // printf("%f\n", net.layers[k].neurons[j].dl_wrt_curr);
-          dl_dw = net.layers[k].neurons[j].dl_wrt_curr * activation_derivative(neuron -> output) * inputs[j];
+          dl_dw = net.layers[k].neurons[j].dl_wrt_curr * sigmoid_derivative(neuron.output) * inputs[j];
 
-          neuron -> weights[j] = neuron -> weights[j] - 0.6 * dl_dw;
+          neuron.weights[j] = neuron.weights[j] - 0.6 * dl_dw;
          // printf("%f\n", neuron -> weights[j]);
         }
       }
@@ -72,15 +73,71 @@ void BackPropagation(Network net, double guess, double target, double inputs[])
     k--;
   }
   
-  
-
-  
-   
-    
 }
 
 
-void Train_model(double inp[], double* inputs, double target, Network net, double iterations)
+void BackPropagation(Network net, double target[], double inputs[])
+{
+  double error;
+  double dl_dw;
+  Neuron neuron;
+
+  int k = 2;
+  while (k >= 0)
+  {
+    for (int i = 0; i < net.layers[k].nb_outputs; i++)
+    {
+      neuron = net.layers[k].neurons[i];
+      for (int j = 0; j < neuron.nb_weights; j++)
+      {
+        // If iterating over last layer
+        if (k == 2)
+        {
+          error = -(target[i] - neuron.output);
+
+          dl_dw = error * sigmoid_derivative(neuron.output) * net.layers[k - 1].neurons[j].output;
+
+          net.layers[k - 1].neurons[j].dl_wrt_curr += neuron.weights[j] * sigmoid_derivative(neuron.output) * error;
+
+          neuron.weights[j] = neuron.weights[j] - 0.6 * dl_dw;
+        }
+        else if (k > 0)
+        {
+          dl_dw = neuron.dl_wrt_curr * sigmoid_derivative(neuron.output) * net.layers[k - 1].neurons[j].output;
+
+          net.layers[k - 1].neurons[j].dl_wrt_curr += neuron.weights[j] * sigmoid_derivative(neuron.output) * neuron.dl_wrt_curr;
+
+          neuron.weights[j] = neuron.weights[j] - 0.6 * dl_dw;
+        }
+        else
+        {
+          dl_dw = neuron.dl_wrt_curr * sigmoid_derivative(neuron.output) * inputs[j];
+
+          neuron.weights[j] = neuron.weights[j] - 0.6 * dl_dw;
+        }
+      }
+      
+    }
+    k--;
+     
+  }
+  
+}
+
+void Train_model(double inp[], double* inputs, double target[], Network net, size_t iterations)
+{
+  double *res;
+  for (size_t i = 0; i < iterations; i++)
+  {
+    res = FeedForward(inputs, net);
+    BackPropagation(net, target, inp);
+
+  }
+  
+}
+
+
+void Train_modelXOR(double inp[], double* inputs, double target, Network net, double iterations)
 {
   double *res;
 
@@ -89,7 +146,7 @@ void Train_model(double inp[], double* inputs, double target, Network net, doubl
    
     res = FeedForwardXOR(inputs, net);
     //printf("%f\n", *res);
-    BackPropagation(net, *res, target, inp);
+    BackPropagationXOR(net, target, inp);
   }
   
 }
@@ -131,11 +188,21 @@ double* FeedForwardXOR(double* input, Network net)
   return net.output;
 }
 
+void Prediction(double* result)
+{
+  if (*result>0.5)
+    printf("The answer is %f\n", 1.0);
+    
+  else
+    printf("The answer is %f\n", 0.0);
+}
+
 int main()
 {
   srand(time(NULL));
-  double arr[2] = {0, 1};
+  double arr[2] = {0, 0};
   double *inputs = arr;
+  double target[26] = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0, 0, 0, 0, 0, 0, 0, 0};
 
   /*Neuron n = GenerateNeuron(2);
   for (size_t i = 0; i < n.nb_weights; i++)
@@ -166,6 +233,7 @@ int main()
   }*/
 
   Network XOR = GenerateNetworkXOR();
+  Network OCR = GenerateNetwork();
 
   /*for (size_t k = 0; k < 2 ; k++)
   {
@@ -183,12 +251,13 @@ int main()
 
   double* result;
   result = FeedForwardXOR(inputs, XOR);
-  printf("Before Training = %f\n", *result);
+  printf("Before Training, output is = %f\n", *result);
   printf("..............\n");
 
-  Train_model(arr, inputs, 1, XOR, 5000);
+  Train_modelXOR(arr, inputs, 0, XOR, 10000);
 
   result = FeedForwardXOR(inputs, XOR);
 
   printf("After Training, output is = %f\n", *result);
+  //Prediction(result);
 }

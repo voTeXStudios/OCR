@@ -24,13 +24,30 @@ double sigmoid(double x)
   return result;
 }
 
+double Relu(double x)
+{
+  double result;
+  if (x>0)
+    return x;
+  else
+    return 0.01 * x; 
+}
+
 
 // Does the derivation for activation function. Here sigmoid. Helps in back propagation
-double activation_derivative(double guess)
+double sigmoid_derivative(double guess)
 {
   double result;
   result = guess * (1.0 - guess);
   return result;
+}
+
+double Relu_activation(double guess)
+{
+  if (guess > 0)
+    return 1;
+  else
+    return 0.01;
 }
 
 
@@ -46,7 +63,7 @@ double ProcessNeuron(double *inputs, Neuron *N)
 	N -> output += N -> bias;
   N -> bef_activation = N -> output;
 	N -> output = sigmoid(N -> output);
-  N -> dl_wrt_curr = 1;
+  N -> dl_wrt_curr = 0;
   //free(N -> weights);
 	return N -> output;
 }
