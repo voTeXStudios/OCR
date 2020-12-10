@@ -44,6 +44,6 @@ clean:
 	${RM} main
 	${RM} Network
 	${RM} *.bmp
+	${RM} layer[1-3]data
 
 #END
-	

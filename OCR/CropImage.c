@@ -1,5 +1,5 @@
-#include<SDL/SDL.h>
-#include<SDL/SDL_image.h>
+#include"SDL/SDL.h"
+#include"SDL/SDL_image.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include "pixeloperations.h"
@@ -28,7 +28,7 @@ SDL_Surface* IncreaseTheSizeImage(SDL_Surface* image)
             pixel = SDL_MapRGB(newImage->format, r, g, b);
             put_pixel(newImage, j+5, i+5, pixel);
         }
-        
+
     }
     return newImage;
 }
@@ -36,7 +36,7 @@ SDL_Surface* IncreaseTheSizeImage(SDL_Surface* image)
 
 int CalcMinFromLeft(SDL_Surface *image)
 {
-   
+
    Uint8 r, g, b;
    Uint32 pixel;
    int min = INT32_MAX;
@@ -56,15 +56,15 @@ int CalcMinFromLeft(SDL_Surface *image)
                         min = j - 3;
                     else
                         min = j;
-                    
+
                     break;
                }
-                    
-               
+
+
            }
-           
+
        }
-       
+
     }
     return min;
 
@@ -78,7 +78,7 @@ int CalcMinFromRight(SDL_Surface *image)
     int width = image->w;
     int height = image->h;
     for (int i = 0; i < height; i++)
-    {   
+    {
         for (int j = width - 1; j >= 0; j--)
         {
             pixel = get_pixel(image, j, i);
@@ -89,15 +89,15 @@ int CalcMinFromRight(SDL_Surface *image)
                 {
                     if(j + 3 < width)
                         min = j + 3;
-                    
+
                     else
                         min = j;
-                    
+
                     break;
-                }    
+                }
             }
         }
-        
+
     }
     return min;
 }
@@ -121,10 +121,10 @@ int CalcMinFromTop(SDL_Surface *image)
 				{
                     if (j - 3 >= 0)
                         min = j - 3;
-                    
+
                     else
                         min = j;
-                    
+
                     break;
 				}
 			}
@@ -152,10 +152,10 @@ int CalcMinFromBot(SDL_Surface *image)
 				{
                     if (j + 3 < height)
                         min = j + 3;   /* code */
-                    
+
                     else
                         min = j;
-                    
+
                     break;
 				}
 			}
@@ -183,7 +183,7 @@ SDL_Surface* Crop(SDL_Surface* img)
 
 
     for (int i = mintop; i < minBot; i++)
-    {   
+    {
         newImageX = 0;
         for (int j = minLeft; j < minRight; j++)
         {
@@ -207,13 +207,9 @@ SDL_Surface* ChipTheEdges(SDL_Surface *img)
     SDL_Surface* s;
     //s = Crop(img);
     s = IncreaseTheSizeImage(img);
-   
+
 
    // SDL_SaveBMP(s, "Images/CroppedImage.bmp");
     return s;
 
 }
-
-
-
-

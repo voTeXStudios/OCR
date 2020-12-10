@@ -258,10 +258,10 @@ void Prediction(double* result, char letters[])
 
 ////////////Saving weights and biases in a txt file///////////
 
-void write_file(Layer layer)
+void write_file(Layer layer, char* filename)
 {
   FILE *file;
-  file = fopen("Network data.txt", "a");
+  file = fopen(filename, "a");
   for (size_t i = 0; i < layer.nb_outputs; i++)
   {
 
@@ -275,11 +275,12 @@ void write_file(Layer layer)
 }
 
 ////////////reading weights and biases in a txt file///////////
-void read_file(Layer l)
+void read_file(Layer l, int nb_bias, int nb_weigths, char* filename)
 {
   FILE *file;
-  file = fopen("Network data.txt", "r");
-  double data[30];
+  file = fopen(filename, "r");
+  int r = nb_bias + nb_weigths;
+  double data[r];
   int i = 0;
   while (!feof(file))
   {
@@ -290,7 +291,7 @@ void read_file(Layer l)
   i = 0;
   for (size_t j = 0; j < l.nb_outputs; j++)
   {
-    printf(" neuron %ld\n", i);
+    //printf(" neuron %d\n", i);
     for (size_t k = 0; k < l.neurons -> nb_weights; k++)
     {
       (l.neurons[j].weights)[k] = data[i];
@@ -314,9 +315,12 @@ int main()
   //double *inputs_xor = inputXOR;
 
   img = load_image("9char.bmp");
-  double target[26] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double target[26] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   double pixels[784];
   double* result;
+
+  double *result2;
+
   pixel_values(img, pixels);
   double *inputs_ocr = pixels;
 
@@ -324,6 +328,7 @@ int main()
 
   /// INIT NETWORK //
   Network OCR = GenerateNetwork();
+  Network OCR2 = GenerateNetwork();
 
   // First FEED Forward ////////
   result = FeedForward(inputs_ocr, OCR);
@@ -355,8 +360,26 @@ int main()
   // Do the Prediction /////////////
   Prediction(result, letters);
 
+  write_file(OCR.layers[0], "layer1data");
+  write_file(OCR.layers[1], "layer2data");
+  write_file(OCR.layers[2], "layer3data");
 
-  Neuron n = GenerateNeuron(2);
+  read_file(OCR2.layers[0], 70, 70*784, "layer1data");
+  //write_file(OCR2.layers[0], "layer1data1");
+  read_file(OCR2.layers[1], 50, 50*70, "layer2data");
+  read_file(OCR2.layers[2], 26, 26*50, "layer3data");
+
+  result2 = FeedForward(inputs_ocr, OCR2);
+  for (size_t i = 0; i < 26; i++)
+  {
+    printf("%f\n", result2[i]);
+  }
+
+
+  // Do the Prediction /////////////
+  Prediction(result2, letters);
+
+  /*Neuron n = GenerateNeuron(2);
   for (size_t i = 0; i < n.nb_weights; i++)
   {
     printf(" weight%li = %f\n",i , n.weights[i]);
@@ -424,7 +447,7 @@ int main()
 
   }
 
-  /*
+
   Layer l = GenerateLayer(5, 5);
   for (size_t i = 0; i < l.nb_outputs; i++)
   {
