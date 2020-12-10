@@ -30,7 +30,7 @@ Layer GenerateLayer(double nb_neurons, double nb_inputs) // nb_neurons = 549 nb_
   return l;
 }
 
-double* ProcessLayer(double *input, Layer *l, double nb_inputs)
+double* ProcessLayer(double *input, Layer *l)
 {
 	l -> output = calloc(l -> nb_outputs, sizeof(double));
 	double *begin = l -> output;

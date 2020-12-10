@@ -10,7 +10,6 @@ struct Neuron
   double nb_weights;
 	double *weights;
 	double bias;
-  double bef_activation;
 	double output;
   double dl_wrt_curr;
 };
@@ -24,15 +23,6 @@ double sigmoid(double x)
   return result;
 }
 
-double Relu(double x)
-{
-  double result;
-  if (x>0)
-    return x;
-  else
-    return 0.01 * x; 
-}
-
 
 // Does the derivation for activation function. Here sigmoid. Helps in back propagation
 double sigmoid_derivative(double guess)
@@ -40,14 +30,6 @@ double sigmoid_derivative(double guess)
   double result;
   result = guess * (1.0 - guess);
   return result;
-}
-
-double Relu_activation(double guess)
-{
-  if (guess > 0)
-    return 1;
-  else
-    return 0.01;
 }
 
 
@@ -61,7 +43,6 @@ double ProcessNeuron(double *inputs, Neuron *N)
     N -> output += N -> weights[i] * inputs[i];
 	}
 	N -> output += N -> bias;
-  N -> bef_activation = N -> output;
 	N -> output = sigmoid(N -> output);
   N -> dl_wrt_curr = 0;
   //free(N -> weights);
@@ -70,7 +51,7 @@ double ProcessNeuron(double *inputs, Neuron *N)
 
 double randomnum()
 {
-  return (double)rand() / (double)RAND_MAX;
+  return ((double)rand() / (double)RAND_MAX) * 2.0 - 1.0;
 }
 
 Neuron GenerateNeuron(double nb_inputs)
@@ -84,6 +65,7 @@ Neuron GenerateNeuron(double nb_inputs)
   for (size_t i = 0 ; i < nb_inputs; i++)
   {
     begin[i] = randomnum();
+    //printf("%f weight initialised\n", begin[i]);
   }
 	return n;
 }

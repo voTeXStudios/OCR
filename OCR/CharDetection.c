@@ -44,6 +44,34 @@ void DrawVerLine(SDL_Surface *image, int x, int start, int end)
 
 }
 
+// This function is to provide a bit of white background to character images just to have a cleaner look // 
+SDL_Surface* IncSizeImg(SDL_Surface* image)
+{
+    Uint8 r, g, b;
+    Uint32 pixel;
+    SDL_Surface* newImage;
+    int height = image->h;
+    int width = image->w;
+    int new_Width = width + 10;
+    int new_height = height + 10;
+    newImage = SDL_CreateRGBSurface(0, new_Width, new_height, 32, 0, 0, 0, 0);
+    SDL_FillRect(newImage, NULL, SDL_MapRGB(newImage->format, 255, 255, 255));
+
+    for (int i = 0; i < height; i++)
+    {
+        for (int j = 0; j < width; j++)
+        {
+            pixel = get_pixel(image, j, i);
+            SDL_GetRGB(pixel, image->format, &r, &g, &b);
+            pixel = SDL_MapRGB(newImage->format, r, g, b);
+            put_pixel(newImage, j+5, i+5, pixel);
+        }
+        
+    }
+    return newImage;
+}
+
+
 // Segment the characters and store them
 void CharSeg(SDL_Surface *image, int h1, int h2, int start, int end)
 {
@@ -148,7 +176,7 @@ void FindLineBlock(SDL_Surface *img)
                 if (!metBlack)
                 {
                     metBlack = true;
-                   // DrawHorLine(img, i);
+                    //DrawHorLine(img, i);
                     start = i;
                 }
             }
@@ -157,7 +185,7 @@ void FindLineBlock(SDL_Surface *img)
         if (metWhiterow && metBlack)
         {
             metBlack = false;
-           // DrawHorLine(img, i);
+            //DrawHorLine(img, i);
             FindCharacters(img, start, i);
         }
         
@@ -204,7 +232,7 @@ SDL_Surface* Compression(SDL_Surface* img, int x, int y)
 SDL_Surface** DetectCharacter(SDL_Surface *img)
 {
     int size = img->w;
-    printf("%i\n", size);
+    //printf("%i\n", size);
     Char = 0;
     surfaces = (SDL_Surface**)malloc(size * sizeof(SDL_Surface*));
     SDL_Surface *cImages;
@@ -233,6 +261,7 @@ SDL_Surface** DetectCharacter(SDL_Surface *img)
     while (*(surfaces + i) != NULL)
     {
         cImages = *(surfaces + i);
+        cImages = IncSizeImg(cImages);
         *(surfaces + i) = Compression(cImages, 28, 28);
         i++;
     }

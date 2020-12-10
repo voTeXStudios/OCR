@@ -10,11 +10,14 @@ all: main Network
 
 main: CropImage.o CharDetection.o BlackAndWhite.o pixeloperations.o GaussianBlur.o
 
-Network: neuronX.o
-	gcc networkX.c -lm -o Network
+Network: Layer.o Neuron.o
+	gcc Network.c -lm -lSDL -lSDL_image -o Network
 
-neuronX.o: neuronX.c
-	gcc -c networkX.c -lm
+#neuronX.o: neuronX.c
+	#gcc -c networkX.c -lm
+
+neuronX.o: Layer.c Neuron.c
+	gcc -c Network.c -lm -lSDL -lSDL_image
 
 
 CropImage.o: CropImage.c CropImage.h pixeloperations.h

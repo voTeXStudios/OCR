@@ -148,7 +148,7 @@ int CalcMinFromBot(SDL_Surface *image)
 			SDL_GetRGB(pixel, image->format, &r, &g, &b);
 			if (r == 0 && g == 0 && b == 0)
 			{
-				if (j>min)
+				if (j > min)
 				{
                     if (j + 3 < height)
                         min = j + 3;   /* code */
@@ -205,8 +205,9 @@ SDL_Surface* Crop(SDL_Surface* img)
 SDL_Surface* ChipTheEdges(SDL_Surface *img)
 {
     SDL_Surface* s;
+    //s = Crop(img);
     s = IncreaseTheSizeImage(img);
-    s = Crop(s);
+   
 
    // SDL_SaveBMP(s, "Images/CroppedImage.bmp");
     return s;

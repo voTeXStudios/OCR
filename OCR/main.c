@@ -81,7 +81,7 @@ void wait_for_keypressed()
 
 
 
-
+// Saves the images. This function is Temporary //
 void SaveImages(SDL_Surface** surfaces)
 {
     int i = 0;
@@ -89,11 +89,17 @@ void SaveImages(SDL_Surface** surfaces)
     {
         char number_str[100];
         sprintf(number_str, "%d", i);
-        strcat(number_str, "res.bmp");
+        strcat(number_str, "char.bmp");
         SDL_SaveBMP(*(surfaces + i), number_str);
         i++; 
     }
 }
+
+
+
+
+
+
 
 
 int main(int argc, char **argv)
@@ -103,9 +109,9 @@ int main(int argc, char **argv)
     char* imagePath = argv[1];
     SDL_Surface *screen;
     SDL_Surface *image;
-   // SDL_Surface *s;
+    SDL_Surface *s;
 
-   // SDL_Surface** surfaces;
+    SDL_Surface** surfaces;
 
     
     
@@ -123,39 +129,37 @@ int main(int argc, char **argv)
 
     //Load the required image.
     image = load_image(imagePath);
-
+    
     if (image->h > 2000 && image->w > 2000)
     {
         image = Compression(image, 1000, 1000);
+        printf("Image Compressed to 1000*1000\n");
     }
-
-   // screen = SDL_SetVideoMode(image->w, image->h, 0, SDL_SWSURFACE|SDL_ANYFORMAT);
-
-    
-    screen = displayImage(image);
-    wait_for_keypressed();
+    //screen = displayImage(image);
+    //wait_for_keypressed();
 
     grayScale(image);
-    update_surface(screen, image);
-    wait_for_keypressed();
+    //update_surface(screen, image);
+    //wait_for_keypressed();
 
     Convolution(image);
-    update_surface(screen, image);
-    wait_for_keypressed();
+    //update_surface(screen, image);
+    //wait_for_keypressed();
 
     Binarise(image);
-    update_surface(screen, image);
-    wait_for_keypressed();
+   // Convolution(image);
+    //update_surface(screen, image);
+    //wait_for_keypressed();
     
     //Crop the unwanted portion of the image.
-    /*
     s = ChipTheEdges(image);
 
-    screen = displayImage(s);
 
 
     //Detect the characters.
     surfaces = DetectCharacter(s);
+
+    screen = displayImage(s);
 
 
     //Save Images in files
@@ -166,7 +170,7 @@ int main(int argc, char **argv)
 
     //printf("%i", NbCharacters());
 
-  */
+  
 
 
    
@@ -179,9 +183,9 @@ int main(int argc, char **argv)
     
     
    
-   // free(surfaces);   
+    free(surfaces);   
     SDL_FreeSurface(screen);
-   // SDL_FreeSurface(s);
+    SDL_FreeSurface(s);
     SDL_FreeSurface(image);
   
 
