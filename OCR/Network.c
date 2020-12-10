@@ -12,11 +12,12 @@
 
 
 ////////////////////// SDL //////////////////////////////
+
 void init_SDL()
 {
     if(SDL_Init(SDL_INIT_VIDEO) == -1)
         errx(1, "Could not initialize SDL: %s. \n", SDL_GetError());
-    
+
 }
 
 
@@ -47,9 +48,9 @@ void pixel_values(SDL_Surface* img, double pixels[])
       pixel = get_pixel(img, j, i);
       pixels[i * 28 + j] = pixel/255;
     }
-    
+
   }
-  
+
 }
 
 //////////////////////////////////////////////////////////
@@ -139,12 +140,12 @@ void BackPropagation(Network net, double target[], double* inputs)
           neuron->weights[j] = neuron->weights[j] - 0.3 * dl_dw;
         }
       }
-      
+
     }
     k--;
-     
+
   }
-  
+
 }
 
 
@@ -159,7 +160,7 @@ void Train_model(double* inputs, double target[], Network net, size_t iterations
     BackPropagation(net, target, inputs);
 
   }
-  
+
 }
 
 
@@ -195,7 +196,7 @@ void BackPropagationXOR(Network net, double target, double* initial_inputs)
     }
     k--;
   }
-  
+
 }
 
 
@@ -210,7 +211,7 @@ void Train_model_XOR(double inp[], double* inputs, double target, Network net, d
     //printf("%f\n", *res);
     BackPropagationXOR(net, target, inp);
   }
-  
+
 }
 
 Network GenerateNetworkXOR()
@@ -246,25 +247,72 @@ void Prediction(double* result, char letters[])
     for (size_t i = 0; i < 26; i++)
     {
       if (result[i] > 0.5)
-      {  
+      {
         printf("Predicted by the model: %c\n", letters[i]);
         break;
       }
-        
+
     }
-    
+
+}
+
+////////////Saving weights and biases in a txt file///////////
+
+void write_file(Layer layer)
+{
+  FILE *file;
+  file = fopen("Network data.txt", "a");
+  for (size_t i = 0; i < layer.nb_outputs; i++)
+  {
+
+    for (size_t j = 0; j < layer.neurons -> nb_weights; j++)
+    {
+      fprintf (file, "%f\n", (layer.neurons[i].weights)[j]);
+    }
+    fprintf(file, "%f\n", layer.neurons[i].bias);
+  }
+  fclose(file);
+}
+
+////////////reading weights and biases in a txt file///////////
+void read_file(Layer l)
+{
+  FILE *file;
+  file = fopen("Network data.txt", "r");
+  double data[30];
+  int i = 0;
+  while (!feof(file))
+  {
+    fscanf(file, "%lf", &data[i]);
+    i += 1;
+  }
+  fclose(file);
+  i = 0;
+  for (size_t j = 0; j < l.nb_outputs; j++)
+  {
+    printf(" neuron %ld\n", i);
+    for (size_t k = 0; k < l.neurons -> nb_weights; k++)
+    {
+      (l.neurons[j].weights)[k] = data[i];
+      i += 1;
+    }
+    l.neurons[j].bias = data[i];
+    i += 1;
+  }
+
 }
 //////////////////////////////////////////
 
 
 int main()
 {
+
   SDL_Surface *img;
   srand(time(NULL));
 
   //double inputXOR[2] = {0, 0};
   //double *inputs_xor = inputXOR;
-   
+
   img = load_image("9char.bmp");
   double target[26] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   double pixels[784];
@@ -285,7 +333,7 @@ int main()
     printf("%f\n", *result);
     result++;
   }
-  
+
 
   printf(">>>>>>>................<<<<<<<<<<\n");
 
@@ -308,7 +356,7 @@ int main()
   Prediction(result, letters);
 
 
-  /*Neuron n = GenerateNeuron(2);
+  Neuron n = GenerateNeuron(2);
   for (size_t i = 0; i < n.nb_weights; i++)
   {
     printf(" weight%li = %f\n",i , n.weights[i]);
@@ -334,11 +382,11 @@ int main()
   for (size_t i = 0; i < l.nb_outputs; i++)
   {
     printf(" output%li = %f\n",i , l.output[i]);
-  }*/
+  }
 
-  
 
-  /*for (size_t k = 0; k < 2 ; k++)
+
+  for (size_t k = 0; k < 2 ; k++)
   {
     printf("layer%ld\n", k);
     for (size_t i = 0; i < XOR.layers[k].nb_outputs; i++)
@@ -350,9 +398,9 @@ int main()
       }
       printf(" bias = %f\n", XOR.layers[k].neurons[i].bias);
     }
-  }*/
+  }
 
-  /*double* result;
+  double* result;
   result = FeedForwardXOR(inputs, XOR);
   printf("Before Training, output is = %f\n", *result);
   printf("..............\n");
@@ -362,19 +410,45 @@ int main()
   result = FeedForwardXOR(inputs, XOR);
 
   printf("After Training, output is = %f\n", *result);
-  //Prediction(result);*/
+  //Prediction(result);
 
-  
-  /*
+
+
   for (size_t i = 0; i < 28; i++)
   {
     for (size_t j = 0; j < 28; j++)
     {
       printf("%f\n", pixels[i*28+j]);
     }
-    
-    
-  }*/
-  
+
+
+  }
+
+  /*
+  Layer l = GenerateLayer(5, 5);
+  for (size_t i = 0; i < l.nb_outputs; i++)
+  {
+    printf(" neuron %ld\n", i);
+    for (size_t j = 0; j < l.neurons -> nb_weights; j++)
+    {
+      printf(" weight%li = %f\n",j , (l.neurons[i].weights)[j]);
+    }
+    printf(" bias = %f\n", l.neurons[i].bias);
+  }
+  write_file(l);
+  read_file(l);
+
+  printf("------NEW LAYER-------");
+  for (size_t i = 0; i < l.nb_outputs; i++)
+  {
+    printf(" neuron %ld\n", i);
+    for (size_t j = 0; j < l.neurons -> nb_weights; j++)
+    {
+      printf(" weight%li = %f\n",j , (l.neurons[i].weights)[j]);
+    }
+    printf(" bias = %f\n", l.neurons[i].bias);
+  }
+  */
+
 
 }
