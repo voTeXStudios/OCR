@@ -35,21 +35,23 @@ SDL_Surface* load_image(char* path)
 
 
 
-void pixel_values(SDL_Surface* img, double pixels[])
+double* pixel_values(SDL_Surface* img)
 {
   Uint8 pixel;
   Uint8 r, g, b;
   int height = img->h;
   int width = img->w;
+  double* pixel_val = calloc(784, sizeof(double));
   for (int i = 0; i < height; i++)
   {
     for (int j = 0; j < width; j++)
     {
       pixel = get_pixel(img, j, i);
-      pixels[i * 28 + j] = pixel/255;
+      pixel_val[i * 28 + j] = pixel/255;
     }
 
   }
+  return pixel_val;
 
 }
 
@@ -98,7 +100,7 @@ double* FeedForward(double* input, Network net)
 
 
 //// BACK PROPAGATION //////////////
-void BackPropagation(Network net, double target[], double* inputs)
+void BackPropagation(Network net, double* target, double* inputs)
 {
   double error;
   double dl_dw;
@@ -150,94 +152,17 @@ void BackPropagation(Network net, double target[], double* inputs)
 
 
 /// Train The mode. Preparation for prediction
-void Train_model(double* inputs, double target[], Network net, size_t iterations)
+void Train_model(double* inputs, double* target, Network net, size_t iterations)
 {
   double *res;
   for (int i = 0; i < iterations; i++)
   {
     res = FeedForward(inputs, net);
-    printf("%i epoch\n", i);
+    //printf("%i epoch\n", i);
     BackPropagation(net, target, inputs);
 
   }
 
-}
-
-
-////////////////////////////////////////////// XOR SYSTEM STARTS HERE ////////////////////////////////////////////////////////////
-void BackPropagationXOR(Network net, double target, double* initial_inputs)
-{
-  double error;
-  double dl_dw;
-  Neuron* neuron;
-  int k = 1;
-  while (k >= 0)
-  {
-    for (int i = 0; i < net.layers[k].nb_outputs; i++)
-    {
-      neuron = &net.layers[k].neurons[i];
-      for (int j = 0; j < neuron->nb_weights; j++)
-      {
-        if (k == 1)
-        {
-          error = -(target - neuron -> output);
-          dl_dw = error * sigmoid_derivative(neuron->output) * net.layers[k - 1].neurons[j].output;
-          net.layers[k - 1].neurons[j].dl_wrt_curr += neuron->weights[j] * sigmoid_derivative(neuron->output) * error;
-
-          neuron->weights[j] = neuron->weights[j] - 0.6 * dl_dw;
-        }
-        else
-        {
-          dl_dw = net.layers[k].neurons[j].dl_wrt_curr * sigmoid_derivative(neuron->output) * initial_inputs[j];
-
-          neuron->weights[j] = neuron->weights[j] - 0.6 * dl_dw;
-        }
-      }
-    }
-    k--;
-  }
-
-}
-
-
-void Train_model_XOR(double inp[], double* inputs, double target, Network net, double iterations)
-{
-  double *res;
-
-  for (size_t i = 0; i < iterations; i++)
-  {
-    //printf("epochs\n");
-    res = FeedForwardXOR(inputs, net);
-    //printf("%f\n", *res);
-    BackPropagationXOR(net, target, inp);
-  }
-
-}
-
-Network GenerateNetworkXOR()
-{
-  double nb_neurons[2] = {2, 1};
-  double nb_inputs[2] = {2, 2};
-  Network net;
-  for (size_t i = 0; i < 2; i++)
-  {
-    net.layers[i] = GenerateLayer(nb_neurons[i], nb_inputs[i]);
-  }
-
-  return net;
-}
-
-
-double* FeedForwardXOR(double* input, Network net)
-{
-  double nb_inputs = 2;
-  net.output = input;
-  for(size_t i = 0; i < 2; i++)
-  {
-    net.output = ProcessLayer(net.output, &net.layers[i]);
-    nb_inputs = net.layers[i].nb_outputs;
-  }
-  return net.output;
 }
 
 
@@ -305,56 +230,146 @@ void read_file(Layer l, int nb_bias, int nb_weigths, char* filename)
 //////////////////////////////////////////
 
 
+
+///// Print the guess outputs ////////
+
+void _Print(double* results)
+{
+  for (size_t i = 0; i < 26; i++)
+  {
+    printf("%f\n", results[i]);
+  }
+}
+
+//// Array of training images ///////////////
+SDL_Surface** image_set()
+{
+  SDL_Surface** images = calloc(26, sizeof(SDL_Surface*));
+  for (int i = 0; i < 26; i++)
+  {
+    char number_str[10];
+    char dir[100] = "training_images/";
+    sprintf(number_str, "%d", i);
+    strcat(dir, number_str);
+    strcat(dir, "char.bmp");
+    *(images+i) = load_image(dir);
+  }
+  return images;
+  
+}
+
+
+//////////////////shuffling function////////////////////////
+
+void shuffle(int *array,int *targets[], size_t n)
+{
+    if (n > 1)
+    {
+        size_t i;
+        for (i = 0; i < n - 1; i++)
+        {
+          size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+          int t = array[j];
+          array[j] = array[i];
+          array[i] = t;
+        }
+    }
+}
+
+
 int main()
 {
-
-  SDL_Surface *img;
+  SDL_Surface** training_images;
   srand(time(NULL));
-
-  //double inputXOR[2] = {0, 0};
-  //double *inputs_xor = inputXOR;
-
-  img = load_image("9char.bmp");
+  char letters[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
   double target[26] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  double pixels[784];
+  double* pixel_arr;
   double* result;
+  double* result2;
 
-  double *result2;
+  training_images = image_set();
+  printf("images stored\n");
 
-  pixel_values(img, pixels);
-  double *inputs_ocr = pixels;
+  int inputsindices[26] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
 
-  char letters[26] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+  double target1[26] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t1 = target1;
+  double target2[26] = {0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t2 = target2;
+  double target3[26] = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t3 = target3;
+  double target4[26] = {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t4 = target4;
+  double target5[26] = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t5 = target5;
+  double target6[26] = {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t6 = target6;
+  double target7[26] = {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t7 = target7;
+  double target8[26] = {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t8 = target8;
+  double target9[26] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t9 = target9;
+  double target10[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t10 = target10;
+  double target11[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t11 = target11;
+  double target12[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t12 = target12;
+  double target13[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t13 = target13;
+  double target14[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t14 = target14;
+  double target15[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t15 = target15;
+  double target16[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t16 = target16;
+  double target17[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t17 = target17;
+  double target18[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0};
+  double *t18 = target18;
+  double target19[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0};
+  double *t19 = target19;
+  double target20[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0};
+  double *t20 = target20;
+  double target21[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0};
+  double *t21 = target21;
+  double target22[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0};
+  double *t22 = target22;
+  double target23[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0};
+  double *t23 = target23;
+  double target24[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0};
+  double *t24 = target24;
+  double target25[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0};
+  double *t25 = target25;
+  double target26[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
+  double *t26 = target26;
+
+  double *targets[26] = {t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17, t18, t19, t20, t21, t22, t23, t24, t25, t26};
+
+
+  pixel_arr = pixel_values(training_images[0]);
+
+
+  
 
   /// INIT NETWORK //
   Network OCR = GenerateNetwork();
   Network OCR2 = GenerateNetwork();
 
   // First FEED Forward ////////
-  result = FeedForward(inputs_ocr, OCR);
-
-  for (size_t i = 0; i < 26; i++)
-  {
-    printf("%f\n", *result);
-    result++;
-  }
+  result = FeedForward(pixel_arr, OCR);
+  _Print(result);
 
 
   printf(">>>>>>>................<<<<<<<<<<\n");
-
-  ///////// Train the model as per number of iterations /////////////////
-  Train_model(inputs_ocr, target, OCR, 500);
-
+  Train_model(pixel_arr, targets[0], OCR, 500);
   printf(">>>>>>>>>>>Model Trained<<<<<<<<<<<<\n");
 
 
   /// Final FEED Forward ////////////
-  result = FeedForward(inputs_ocr, OCR);
-
-  for (size_t i = 0; i < 26; i++)
-  {
-    printf("%f\n", result[i]);
-  }
+  result = FeedForward(pixel_arr, OCR);
+  _Print(result);
 
 
   // Do the Prediction /////////////
@@ -364,114 +379,24 @@ int main()
   write_file(OCR.layers[1], "layer2data");
   write_file(OCR.layers[2], "layer3data");
 
+  
   read_file(OCR2.layers[0], 70, 70*784, "layer1data");
-  //write_file(OCR2.layers[0], "layer1data1");
   read_file(OCR2.layers[1], 50, 50*70, "layer2data");
   read_file(OCR2.layers[2], 26, 26*50, "layer3data");
 
-  result2 = FeedForward(inputs_ocr, OCR2);
-  for (size_t i = 0; i < 26; i++)
-  {
-    printf("%f\n", result2[i]);
-  }
-
+  result2 = FeedForward(pixel_arr, OCR2);
+  _Print(result2);
 
   // Do the Prediction /////////////
   Prediction(result2, letters);
 
-  /*Neuron n = GenerateNeuron(2);
-  for (size_t i = 0; i < n.nb_weights; i++)
-  {
-    printf(" weight%li = %f\n",i , n.weights[i]);
-  }
-  printf(" bias = %f\n", n.bias);
-
-  ProcessNeuron(inputs, &n);
-
-  printf(" %f\n", n.output);
-  Layer l = GenerateLayer(2, 2);
-  for (size_t i = 0; i < l.nb_outputs; i++)
-  {
-    printf(" neuron %ld\n", i);
-    for (size_t j = 0; j < l.neurons -> nb_weights; j++)
-    {
-      printf(" weight%li = %f\n",j , (l.neurons[i].weights)[j]);
-    }
-    printf(" bias = %f\n", l.neurons[i].bias);
-  }
-
-  ProcessLayer(inputs, &l, 2);
-
-  for (size_t i = 0; i < l.nb_outputs; i++)
-  {
-    printf(" output%li = %f\n",i , l.output[i]);
-  }
 
 
 
-  for (size_t k = 0; k < 2 ; k++)
-  {
-    printf("layer%ld\n", k);
-    for (size_t i = 0; i < XOR.layers[k].nb_outputs; i++)
-    {
-      printf(" neuron %ld\n", i);
-      for (size_t j = 0; j < XOR.layers[k].neurons -> nb_weights; j++)
-      {
-        printf(" weight%li = %f\n",j , (XOR.layers[k].neurons[i].weights)[j]);
-      }
-      printf(" bias = %f\n", XOR.layers[k].neurons[i].bias);
-    }
-  }
+  //double inputXOR[2] = {0, 0};
+  //double *inputs_xor = inputXOR;
 
-  double* result;
-  result = FeedForwardXOR(inputs, XOR);
-  printf("Before Training, output is = %f\n", *result);
-  printf("..............\n");
-
-  Train_modelXOR(arr, inputs, 0, XOR, 10000);
-
-  result = FeedForwardXOR(inputs, XOR);
-
-  printf("After Training, output is = %f\n", *result);
-  //Prediction(result);
-
-
-
-  for (size_t i = 0; i < 28; i++)
-  {
-    for (size_t j = 0; j < 28; j++)
-    {
-      printf("%f\n", pixels[i*28+j]);
-    }
-
-
-  }
-
-
-  Layer l = GenerateLayer(5, 5);
-  for (size_t i = 0; i < l.nb_outputs; i++)
-  {
-    printf(" neuron %ld\n", i);
-    for (size_t j = 0; j < l.neurons -> nb_weights; j++)
-    {
-      printf(" weight%li = %f\n",j , (l.neurons[i].weights)[j]);
-    }
-    printf(" bias = %f\n", l.neurons[i].bias);
-  }
-  write_file(l);
-  read_file(l);
-
-  printf("------NEW LAYER-------");
-  for (size_t i = 0; i < l.nb_outputs; i++)
-  {
-    printf(" neuron %ld\n", i);
-    for (size_t j = 0; j < l.neurons -> nb_weights; j++)
-    {
-      printf(" weight%li = %f\n",j , (l.neurons[i].weights)[j]);
-    }
-    printf(" bias = %f\n", l.neurons[i].bias);
-  }
-  */
+  
 
 
 }

@@ -91,7 +91,8 @@ void SaveImages(SDL_Surface** surfaces)
         sprintf(number_str, "%d", i);
         strcat(number_str, "char.bmp");
         SDL_SaveBMP(*(surfaces + i), number_str);
-        i++; 
+        i++;
+        //train_images(*(surfaces + i)); 
     }
 }
 
@@ -111,7 +112,7 @@ int main(int argc, char **argv)
     SDL_Surface *image;
     SDL_Surface *s;
 
-    SDL_Surface** surfaces;
+    SDL_Surface **surfaces;
 
     
     
