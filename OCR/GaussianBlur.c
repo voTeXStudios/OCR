@@ -16,7 +16,7 @@ double gauss[9] =    // guauss kernel dim 3 (approximation), calculated ahead of
     1./16., 1./8., 1./16.
 };
 
-double sharpen[9]{
+double sharpen[9] = {
 
 
     0., -1., 0.,
@@ -26,7 +26,7 @@ double sharpen[9]{
     0., -1., 0.
 };
 
-double edge_detection[9]{
+double edge_detection[9] = {
 
 
 
@@ -35,7 +35,7 @@ double edge_detection[9]{
     -1., 4., -1.,
     
     0., -1., 0.
-}
+};
 
 
 /*

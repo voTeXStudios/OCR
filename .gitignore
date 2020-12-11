@@ -1,3 +1,9 @@
 *.d
 *.o
 *.DS_Store
+*.o
+*.d
+*main
+*Network
+*.bmp
+OCR\Network data.txt

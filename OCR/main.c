@@ -142,7 +142,7 @@ int main(int argc, char **argv)
     Binarise(image);
     update_surface(screen, image);
     wait_for_keypressed();
-    Crop the unwanted portion of the image.
+    //Crop the unwanted portion of the image.
     s = ChipTheEdges(image);
 
     update_surface(screen, image);
