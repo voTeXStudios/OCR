@@ -106,25 +106,17 @@ void SaveImages(SDL_Surface** surfaces)
 int main(int argc, char **argv)
 {
    
-
-    char* imagePath = argv[1];
-    SDL_Surface *screen;
-    SDL_Surface *image;
-    SDL_Surface *s;
-
-    SDL_Surface **surfaces;
-
-    
-    
-    
-    
-   
     if (argc != 2)
     {
         errx(1, "One Image required");
         return 1;
     }
-       
+
+    char* imagePath = argv[1];
+    SDL_Surface *screen;
+    SDL_Surface *image;
+    SDL_Surface *s;
+    SDL_Surface **surfaces;
     //Initialise SDL.    
     init_SDL();
 
@@ -136,25 +128,25 @@ int main(int argc, char **argv)
         image = Compression(image, 1000, 1000);
         printf("Image Compressed to 1000*1000\n");
     }
-    //screen = displayImage(image);
-    //wait_for_keypressed();
+    screen = displayImage(image);
+    wait_for_keypressed();
 
     grayScale(image);
-    //update_surface(screen, image);
-    //wait_for_keypressed();
+    update_surface(screen, image);
+    wait_for_keypressed();
 
-    Convolution(image);
-    //update_surface(screen, image);
-    //wait_for_keypressed();
+    Convolution(image,gauss);
+    update_surface(screen, image);
+    wait_for_keypressed();
 
     Binarise(image);
-   // Convolution(image);
-    //update_surface(screen, image);
-    //wait_for_keypressed();
-    
-    //Crop the unwanted portion of the image.
+    update_surface(screen, image);
+    wait_for_keypressed();
+    Crop the unwanted portion of the image.
     s = ChipTheEdges(image);
 
+    update_surface(screen, image);
+    wait_for_keypressed();
 
 
     //Detect the characters.

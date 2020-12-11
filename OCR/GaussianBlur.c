@@ -7,7 +7,7 @@
 #include "GaussianBlur.h"
 
 
-double gauss_kernel_d3[9] =    // guauss kernel dim 3 (approximation), calculated ahead of time
+double gauss[9] =    // guauss kernel dim 3 (approximation), calculated ahead of time
 {
     1./16., 1./8., 1./16.,
     
@@ -15,14 +15,30 @@ double gauss_kernel_d3[9] =    // guauss kernel dim 3 (approximation), calculate
     
     1./16., 1./8., 1./16.
 };
-/*
-double gauss[9] = 
-{
-    1./9., 2./9., 1./9.,
-    2./9., 4./9., 2./9.,
-    1./9., 2./9., 1./9.
 
+double sharpen[9]{
+
+
+    0., -1., 0.,
+    
+    -1., 5., -1.,
+    
+    0., -1., 0.
 };
+
+double edge_detection[9]{
+
+
+
+     0. -1., 0.,
+    
+    -1., 4., -1.,
+    
+    0., -1., 0.
+}
+
+
+/*
 
 
 int Clamp(float c)
@@ -139,9 +155,9 @@ void convolute(SDL_Surface* image_surface, double m[], size_t cols){
     
 }
 
-void Convolution(SDL_Surface *img)
+void Convolution(SDL_Surface *img,double kernel[9])
 {
    // SDL_Surface* s;
-    convolute(img, gauss_kernel_d3, 3);
+    convolute(img, kernel, 3);
     //return s;
 }
