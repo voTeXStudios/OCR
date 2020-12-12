@@ -10,6 +10,5 @@ void grayScale(SDL_Surface *img);
 //float automatic_threshold_value(SDL_Surface* image_surface, float limit);
 //void binarization(SDL_Surface* image_surface, float limit);
 void Binarise(SDL_Surface *img);
-void Contrast(SDL_Surface *img, int threshold);
 
 #endif
