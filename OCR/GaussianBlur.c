@@ -104,32 +104,41 @@ void Convolute(SDL_Surface *image_surface, double m[], int cols)
 
 }*/
 
+Uint8 clamp(double n){
+
+	if (n>255)
+		n= 255;
+	else if (n<0)
+		n= 0;
+	return n;
+}
 
 void convolute(SDL_Surface* image_surface, double m[], size_t cols){ 
        	//intended for grayscaled image and kernel of dim 3
-    
     size_t width = image_surface->w;
     size_t height = image_surface->h;
-    double sum;
-
     Uint8 r, g, b;
+    double r1,g1,b1;
     Uint32 pixel;
+    SDL_Surface *image_surface_copy  = SDL_ConvertSurface(image_surface, image_surface->format, SDL_SWSURFACE);
     for (size_t i = 1; i < height-1; i++)
     {
         for (size_t j = 1; j < width-1; j++)
         {
-            sum = 0;
+            r1 = g1 = b1 = 0;
             for (int x = -1; x <= 1; x++)
             {
 		   // printf("%ld",x);
                 for (int y = -1; y <= 1; y++)
                 {
-                    pixel = get_pixel(image_surface,y+j,x+i);
-                    SDL_GetRGB(pixel, image_surface->format, &r, &g, &b);
-                    sum += (r * m[(x+1)*cols + y+1]);
+                    pixel = get_pixel(image_surface_copy,y+j,x+i);
+                    SDL_GetRGB(pixel, image_surface_copy->format, &r, &g, &b);
+                    r1 += (r * m[(x+1)*cols + y+1]);
+                    g1 += (g * m[(x+1)*cols + y+1]);
+                    b1 += (b * m[(x+1)*cols + y+1]);
                 }
             }
-	        pixel = SDL_MapRGB(image_surface->format, sum, sum, sum);
+	        pixel = SDL_MapRGB(image_surface->format, clamp(r1), clamp(g1), clamp(b1));
             put_pixel(image_surface,j,i,pixel);
         }
     }

@@ -115,48 +115,74 @@ int main(int argc, char **argv)
     char* imagePath = argv[1];
     SDL_Surface *screen;
     SDL_Surface *image;
-    SDL_Surface *s;
-    SDL_Surface **surfaces;
+    //SDL_Surface *s;
+    //SDL_Surface **surfaces;
     //Initialise SDL.    
     init_SDL();
 
     //Load the required image.
     image = load_image(imagePath);
-    
+    if (!image)
+        errx(1, "null surface was given, try again with appropriate image");
+   /* 
     if (image->h > 2000 && image->w > 2000)
     {
         image = Compression(image, 1000, 1000);
         printf("Image Compressed to 1000*1000\n");
     }
+    */
     screen = displayImage(image);
-    wait_for_keypressed();
 
+    wait_for_keypressed();
+    Contrast(image,40);
+    // pick a value from -100 to 100 from decontrasted to ++constrast
+    update_surface(screen, image);
+
+    
+    wait_for_keypressed();
+   Convolution(image,gauss);
+   update_surface(screen, image);
+    wait_for_keypressed();
     grayScale(image);
-    update_surface(screen, image);
-    wait_for_keypressed();
+   update_surface(screen, image);
+   // wait_for_keypressed();
 
-    Convolution(image,gauss);
-    update_surface(screen, image);
-    wait_for_keypressed();
 
-    Binarise(image);
+
+     //update_surface(screen, image);
+  // wait_for_keypressed();
+      // Convolution(image,gauss);
+      // update_surface(screen, image);
+        //wait_for_keypressed();
+        //Convolution(image,edge_detection);
+        //update_surface(screen, image);
+
+    
+    //Convolution(image,sharpen);
+    //update_surface(screen, image);
+    //wait_for_keypressed();
+
+       Binarise(image);
     update_surface(screen, image);
     wait_for_keypressed();
+    
+
+
     //Crop the unwanted portion of the image.
-    s = ChipTheEdges(image);
+    //s = ChipTheEdges(image);
 
     update_surface(screen, image);
     wait_for_keypressed();
 
 
     //Detect the characters.
-    surfaces = DetectCharacter(s);
+    //surfaces = DetectCharacter(s);
 
-    screen = displayImage(s);
+    //screen = displayImage(s);
 
 
     //Save Images in files
-    SaveImages(surfaces);
+    //SaveImages(surfaces);
 
     
     
@@ -176,9 +202,9 @@ int main(int argc, char **argv)
     
     
    
-    free(surfaces);   
+    //free(surfaces);   
     SDL_FreeSurface(screen);
-    SDL_FreeSurface(s);
+    //SDL_FreeSurface(s);
     SDL_FreeSurface(image);
   
 
