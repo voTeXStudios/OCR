@@ -111,7 +111,6 @@ int main(int argc, char **argv)
     SDL_Surface *screen;
     SDL_Surface *image;
     SDL_Surface *s;
-
     SDL_Surface **surfaces;
 
     
@@ -148,7 +147,7 @@ int main(int argc, char **argv)
     //wait_for_keypressed();
 
     Binarise(image);
-   // Convolution(image);
+    //Convolution(image);
     //update_surface(screen, image);
     //wait_for_keypressed();
     

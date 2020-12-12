@@ -34,7 +34,7 @@ SDL_Surface* IncreaseTheSizeImage(SDL_Surface* image)
 }
 
 
-int CalcMinFromLeft(SDL_Surface *image)
+/*int CalcMinFromLeft(SDL_Surface *image)
 {
 
    Uint8 r, g, b;
@@ -151,7 +151,7 @@ int CalcMinFromBot(SDL_Surface *image)
 				if (j > min)
 				{
                     if (j + 3 < height)
-                        min = j + 3;   /* code */
+                        min = j + 3;   
 
                     else
                         min = j;
@@ -196,7 +196,7 @@ SDL_Surface* Crop(SDL_Surface* img)
         newImageY += 1;
     }
     return newImage;
-}
+}*/
 
 
 

@@ -44,7 +44,8 @@ clean:
 	${RM} main
 	${RM} Network
 	${RM} *.bmp
-	#${RM} layer[1-3]data
+	#${RM} batch[1-2]_layer[1-3]data
+	${RM} layer[1-3]data
 	${RM} Network data.txt
 
 #END
