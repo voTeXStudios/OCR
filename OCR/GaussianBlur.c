@@ -48,7 +48,7 @@ Uint8 clamp(double n){
 }
 
 void convolute(SDL_Surface* image_surface, double m[], size_t cols){ 
-       	//intended for grayscaled image and kernel of dim 3
+       	//intented for kernel of dim 3
     size_t width = image_surface->w;
     size_t height = image_surface->h;
     Uint8 r, g, b;
@@ -62,7 +62,6 @@ void convolute(SDL_Surface* image_surface, double m[], size_t cols){
             r1 = g1 = b1 = 0;
             for (int x = -1; x <= 1; x++)
             {
-		   // printf("%ld",x);
                 for (int y = -1; y <= 1; y++)
                 {
                     pixel = get_pixel(image_surface_copy,y+j,x+i);
@@ -92,7 +91,7 @@ void convolute(SDL_Surface* image_surface, double m[], size_t cols){
     
     }
 
-    
+   SDL_FreeSurface(image_surface_copy); 
     
     //possibility to crop image, with white contour this won't matter though
     

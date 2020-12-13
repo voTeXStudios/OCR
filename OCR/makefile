@@ -4,11 +4,10 @@ CC=gcc
 CPPFLAGS= `pkg-config --cflags sdl` -MMD
 CFLAGS= -Wall -Wextra -Werror -std=c99 -O3
 LDFLAGS=
-LDLIBS= `pkg-config --libs sdl` -lSDL_image
-
+LDLIBS= `pkg-config --libs sdl` -lSDL_image -lSDL
 all: main Network
 
-main: CropImage.o CharDetection.o BlackAndWhite.o pixeloperations.o GaussianBlur.o
+main: CropImage.o CharDetection.o BlackAndWhite.o pixeloperations.o GaussianBlur.o deskew.o
 
 Network: Layer.o Neuron.o
 	gcc Network.c -lm -lSDL -lSDL_image -o Network
@@ -32,7 +31,7 @@ GaussianBlur.o: pixeloperations.h GaussianBlur.c GaussianBlur.h
 
 pixeloperations.o: pixeloperations.c pixeloperations.h
 
-
+deskew.o : deskew.c deskew.h
 
 #LetterSegregate.o: LetterSegregate.c LetterSegregate.h pixeloperations.h BlackAndWhite.h
 

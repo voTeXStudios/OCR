@@ -1,6 +1,7 @@
 
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
+#include "SDL/SDL_rotozoom.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdbool.h>
@@ -10,6 +11,7 @@
 #include"BlackAndWhite.h"
 #include"pixeloperations.h"
 #include"GaussianBlur.h"
+#include"deskew.h"
 
 //Initialize the SDL
 void init_SDL()
@@ -134,7 +136,8 @@ int main(int argc, char **argv)
     screen = displayImage(image);
 
     wait_for_keypressed();
-    Contrast(image,40);
+    //Contrast(image,40);
+    man_deskew(image,90.0);
     // pick a value from -100 to 100 from decontrasted to ++constrast
     update_surface(screen, image);
 
