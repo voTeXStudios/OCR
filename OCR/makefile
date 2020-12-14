@@ -1,27 +1,15 @@
 #Start
 
 CC=gcc
-CPPFLAGS= `pkg-config --cflags sdl` -MMD
-CFLAGS= -Wall -Wextra -Werror -std=c99 -O3
+CPPFLAGS= `pkg-config --cflags sdl --cflags gtk+-3.0` -MMD -Wall -O3
+CFLAGS= -Wall -Wextra -std=c99 -O3
 LDFLAGS=
-LDLIBS= `pkg-config --libs sdl` -lSDL_image -lSDL_gfx -lm
-all: main Network
+LDLIBS= `pkg-config --libs sdl --libs gtk+-3.0` -lSDL_image -lm -lSDL
+all: UI_code
 
-main: CropImage.o CharDetection.o BlackAndWhite.o pixeloperations.o GaussianBlur.o deskew.o
-
-Network: Layer.o Neuron.o
-	gcc Network.c -lm -lSDL -lSDL_image -o Network
-
-#neuronX.o: neuronX.c
-	#gcc -c networkX.c -lm
-
-neuronX.o: Layer.c Neuron.c
-	gcc -c Network.c -lm -lSDL -lSDL_image
-
+UI_code: CropImage.o CharDetection.o BlackAndWhite.o pixeloperations.o GaussianBlur.o Network.o Layer.o Neuron.o UI_code.o
 
 CropImage.o: CropImage.c CropImage.h pixeloperations.h
-
-#DetectTextBlock.o: DetectTextBlock.c pixeloperations.h CropImage.h DetectTextBlock.h
 
 CharDetection.o: CharDetection.c pixeloperations.h CharDetection.h
 
@@ -31,11 +19,13 @@ GaussianBlur.o: pixeloperations.h GaussianBlur.c GaussianBlur.h
 
 pixeloperations.o: pixeloperations.c pixeloperations.h
 
-deskew.o : deskew.c deskew.h
+Network.o: Network.c Network.h Layer.h Neuron.h pixeloperations.h
 
-#LetterSegregate.o: LetterSegregate.c LetterSegregate.h pixeloperations.h BlackAndWhite.h
+Layer.o: Layer.c Layer.h
 
-#LineSegregation.o: LineSegregation.c LineSegregation.h CropImage.h pixeloperations.h
+Neuron.o: Neuron.c
+
+UI_code.o : UI_code.c
 
 clean:
 	${RM} *.o

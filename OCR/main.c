@@ -1,7 +1,6 @@
 
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
-#include "SDL/SDL_rotozoom.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdbool.h>
@@ -9,21 +8,24 @@
 #include"CropImage.h"
 #include"CharDetection.h"
 #include"BlackAndWhite.h"
-#include"pixeloperations.h"
-#include"GaussianBlur.h"
-#include"deskew.h"
+//#include"pixeloperations.h"
+//#include"GaussianBlur.h"
+#include"Network.h"
 
 //Initialize the SDL
+/*
 void init_SDL()
 {
     if(SDL_Init(SDL_INIT_VIDEO) == -1)
         errx(1, "Could not initialize SDL: %s. \n", SDL_GetError());
-    
+
 }
+*/
 
 
 
 //Load the image in the memory
+/*
 SDL_Surface* load_image(char* path)
 {
     SDL_Surface *img;
@@ -33,6 +35,7 @@ SDL_Surface* load_image(char* path)
         errx(3, "can't load %s: %s", path, IMG_GetError());
     return img;
 }
+*/
 
 
 //Display the image
@@ -94,7 +97,7 @@ void SaveImages(SDL_Surface** surfaces)
         strcat(number_str, "char.bmp");
         SDL_SaveBMP(*(surfaces + i), number_str);
         i++;
-        //train_images(*(surfaces + i)); 
+        //train_images(*(surfaces + i));
     }
 }
 
@@ -103,11 +106,11 @@ void SaveImages(SDL_Surface** surfaces)
 
 
 
-
+/*
 
 int main(int argc, char **argv)
 {
-   
+
     if (argc != 2)
     {
         errx(1, "One Image required");
@@ -119,36 +122,36 @@ int main(int argc, char **argv)
     SDL_Surface *image;
     //SDL_Surface *s;
     //SDL_Surface **surfaces;
-    //Initialise SDL.    
+    //Initialise SDL.
     init_SDL();
 
     //Load the required image.
     image = load_image(imagePath);
     if (!image)
         errx(1, "null surface was given, try again with appropriate image");
-   /* 
+
     if (image->h > 2000 && image->w > 2000)
     {
         image = Compression(image, 1000, 1000);
         printf("Image Compressed to 1000*1000\n");
     }
-    */
+
     screen = displayImage(image);
 
     wait_for_keypressed();
     //Contrast(image,40);
     // pick a value from -100 to 100 from decontrasted to ++constrast
     //screen = displayImage(image);
-    image = man_deskew(image,0.0);
-    update_surface(screen, image);
+    //image = man_deskew(image,0.0);
+    //update_surface(screen, image);
 
-    
-    wait_for_keypressed();
-   Convolution(image,gauss);
-   update_surface(screen, image);
-    wait_for_keypressed();
+
+    //wait_for_keypressed();
+   //Convolution(image,gauss);
+   //update_surface(screen, image);
+    //wait_for_keypressed();
     grayScale(image);
-   update_surface(screen, image);
+   //update_surface(screen, image);
    // wait_for_keypressed();
 
 
@@ -161,23 +164,23 @@ int main(int argc, char **argv)
         //Convolution(image,edge_detection);
         //update_surface(screen, image);
 
-    
+
     //Convolution(image,sharpen);
     //update_surface(screen, image);
     //wait_for_keypressed();
 
        Binarise(image);
-    update_surface(screen, image);
-    wait_for_keypressed();
-    image = auto_deskew(image);
+  //  update_surface(screen, image);
+  //  wait_for_keypressed();
+    //image = auto_deskew(image);
 
 
 
     //Crop the unwanted portion of the image.
     //s = ChipTheEdges(image);
 
-    update_surface(screen, image);
-    wait_for_keypressed();
+  //  update_surface(screen, image);
+  //  wait_for_keypressed();
 
 
     //Detect the characters.
@@ -188,33 +191,36 @@ int main(int argc, char **argv)
 
     //Save Images in files
     //SaveImages(surfaces);
+    SDL_Surface** surfaces;
+    surfaces = DetectCharacter(image);
+    int nb_characters = NbCharacters();
+    text_conversion(surfaces, nb_characters);
 
-    
-    
+
 
     //printf("%i", NbCharacters());
 
-  
 
 
-   
-    wait_for_keypressed();
-    
-   
-    
 
-    
-    
-    
-   
-    //free(surfaces);   
+
+  //  wait_for_keypressed();
+
+
+
+
+
+
+
+
+    //free(surfaces);
     SDL_FreeSurface(screen);
     //SDL_FreeSurface(s);
     SDL_FreeSurface(image);
-  
 
-    
+
+
 
     return 0;
-    
-}
+
+}*/

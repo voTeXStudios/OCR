@@ -4,12 +4,16 @@
 #include <float.h>
 #include <math.h>
 #include <time.h>
-#include "Layer.c"
 #include "SDL/SDL.h"
 #include "SDL/SDL_image.h"
-#include "pixeloperations.c"
+#include "pixeloperations.h"
 #include "err.h"
-
+#include "Network.h"
+#include"CropImage.h"
+#include"CharDetection.h"
+#include"BlackAndWhite.h"
+//#include "Neuron.h"
+//#include "Layer.h"
 
 ////////////////////// SDL //////////////////////////////
 
@@ -17,7 +21,7 @@ void init_SDL()
 {
     if(SDL_Init(SDL_INIT_VIDEO) == -1)
         errx(1, "Could not initialize SDL: %s. \n", SDL_GetError());
-
+    
 }
 
 
@@ -38,7 +42,7 @@ SDL_Surface* load_image(char* path)
 double* pixel_values(SDL_Surface* img)
 {
   Uint8 pixel;
-  Uint8 r, g, b;
+  //Uint8 r, g;
   int height = img->h;
   int width = img->w;
   double* pixel_val = calloc(784, sizeof(double));
@@ -56,7 +60,7 @@ double* pixel_values(SDL_Surface* img)
 }
 
 //////////////////////////////////////////////////////////
-
+/*
 struct Network
 {
   Layer layers[3];
@@ -69,7 +73,7 @@ double* FeedForwardXOR(double* input, Network net);
 double* FeedForward(double* input, Network net);
 void shuffle(int* array, size_t n);
 /////////
-
+*/
 /////Generates 3 layered Network ///////////
 Network GenerateNetwork()
 {
@@ -87,12 +91,12 @@ Network GenerateNetwork()
 //////// Feed Forward ///// Called after every epoch //////
 double* FeedForward(double* input, Network net)
 {
-  double nb_inputs = 784;
+  //double nb_inputs = 784;
   net.output = input;
   for(size_t i = 0; i < 3; i++)
   {
     net.output = ProcessLayer(net.output, &net.layers[i]);
-    nb_inputs = net.layers[i].nb_outputs;
+  //  nb_inputs = net.layers[i].nb_outputs;
   }
   return net.output;
 }
@@ -155,11 +159,11 @@ void BackPropagation(Network net, double* target, double* inputs)
 /// Train The mode. Preparation for prediction
 void Train_model(double* inputs, double* target, Network net, size_t iterations)
 {
-  double *res;
-  for (int i = 0; i < iterations; i++)
+  //double *res;
+  for (size_t i = 0; i < iterations; i++)
   {
-    res = FeedForward(inputs, net);
-    printf("%i epochs\n", i);
+    //res = FeedForward(inputs, net);
+    printf("%li epochs\n", i);
     BackPropagation(net, target, inputs);
 
   }
@@ -175,25 +179,51 @@ void Train_Network(Network net, SDL_Surface** input_imgs, double *targets[], int
     {
       Train_model(pixel_values(input_imgs[indices[j]]), targets[indices[j]], net, 500);
     }
-    
+
   }
-  
+
 }
 
 
 /////////// Prediction Function /////////////
-void Prediction(double* result, char letters[])
+char Prediction(double* result)
 {
+    char letters_lower[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+    //char letters_upper[26] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+
+    char res = letters_lower[0];
     for (size_t i = 0; i < 26; i++)
     {
       if (result[i] > 0.5)
       {
-        printf("Predicted by the model: %c\n", letters[i]);
-        break;
+
+          res = letters_lower[i];
       }
-
     }
+    //strcat(res, '0');
+    return res;
+}
 
+//////////TEXT CONVERSION //////////
+void text_conversion(SDL_Surface** surfaces, int nb_characters)
+{
+    Network net = GenerateNetwork();
+    read_file(net.layers[0], 70, 70*784, "l1_f1_i50");
+    read_file(net.layers[1], 50, 50*70, "l2_f1_i50");
+    read_file(net.layers[2], 26, 26*50, "l3_f1_i50");
+    //char letters[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+    double* temp;
+    char *result = calloc(nb_characters, sizeof(char));
+    FILE *file;
+    file = fopen("Result", "w");
+    for (int i = 0; i < nb_characters; i++)
+    {
+      temp = FeedForward(pixel_values(surfaces[i]), net);
+      result[i] = Prediction(temp);
+    }
+    fprintf(file, "%s", result);
+    fclose(file);
+    free(result);
 }
 
 ////////////Saving weights and biases in a txt file///////////
@@ -271,7 +301,7 @@ SDL_Surface** image_set1()
     *(images+i) = load_image(dir);
   }
   return images;
-  
+
 }
 
 SDL_Surface** image_set2()
@@ -288,7 +318,7 @@ SDL_Surface** image_set2()
 
   }
   return images;
-  
+
 }
 
 
@@ -309,7 +339,7 @@ void shuffle(int *array, size_t n)
     }
 }
 
-
+/*
 int main()
 {
   //SDL_Surface* img;
@@ -389,7 +419,7 @@ int main()
   pixel_arr = pixel_values(training_images_batch1[2]);
 
 
-  
+
 
   /// INIT NETWORK //////
   Network OCR = GenerateNetwork();
@@ -412,7 +442,7 @@ int main()
 
   //write_file(OCR.layers[0], "batch1_layer1data");
   //write_file(OCR.layers[1], "batch1_layer2data");
-  //write_file(OCR.layers[2], "batch1_layer3data");  
+  //write_file(OCR.layers[2], "batch1_layer3data");
 
   ///Read the weights and biases
   //read_file(OCR2.layers[0], 70, 70*784, "layer1data");
@@ -423,13 +453,13 @@ int main()
  // Train_Network(OCR, training_images_batch2, targets, inputsindices, 55);
   //printf(">>>>>>>>>>>Model Trained Batch2<<<<<<<<<<<<\n");
 
-//  write_file(OCR.layers[0], "batch2_layer1data");
- // write_file(OCR.layers[1], "batch2_layer2data");
+  //write_file(OCR.layers[0], "batch2_layer1data");
+  //write_file(OCR.layers[1], "batch2_layer2data");
   //write_file(OCR.layers[2], "batch2_layer3data");
 
-  read_file(OCR2.layers[0], 70, 70*784, "batch2_layer1data");
-  read_file(OCR2.layers[1], 50, 50*70, "batch2_layer2data");
-  read_file(OCR2.layers[2], 26, 26*50, "batch2_layer3data");
+  //read_file(OCR2.layers[0], 70, 70*784, "batch2_layer1data");
+  //read_file(OCR2.layers[1], 50, 50*70, "batch2_layer2data");
+  //read_file(OCR2.layers[2], 26, 26*50, "batch2_layer3data");
 
   result2 = FeedForward(pixel_arr, OCR2);
   _Print(result2);
@@ -446,7 +476,8 @@ int main()
   //double inputXOR[2] = {0, 0};
   //double *inputs_xor = inputXOR;
 
-  
+
 
 
 }
+*/
