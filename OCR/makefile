@@ -4,7 +4,7 @@ CC=gcc
 CPPFLAGS= `pkg-config --cflags sdl` -MMD
 CFLAGS= -Wall -Wextra -Werror -std=c99 -O3
 LDFLAGS=
-LDLIBS= `pkg-config --libs sdl` -lSDL_image -lSDL
+LDLIBS= `pkg-config --libs sdl` -lSDL_image -lSDL_gfx -lm
 all: main Network
 
 main: CropImage.o CharDetection.o BlackAndWhite.o pixeloperations.o GaussianBlur.o deskew.o

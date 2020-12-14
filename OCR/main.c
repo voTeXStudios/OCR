@@ -137,8 +137,9 @@ int main(int argc, char **argv)
 
     wait_for_keypressed();
     //Contrast(image,40);
-    man_deskew(image,90.0);
     // pick a value from -100 to 100 from decontrasted to ++constrast
+    //screen = displayImage(image);
+    image = man_deskew(image,0.0);
     update_surface(screen, image);
 
     
@@ -168,7 +169,8 @@ int main(int argc, char **argv)
        Binarise(image);
     update_surface(screen, image);
     wait_for_keypressed();
-    
+    image = auto_deskew(image);
+
 
 
     //Crop the unwanted portion of the image.

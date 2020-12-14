@@ -2,17 +2,84 @@
 #include <stdlib.h>
 #include<SDL/SDL.h>
 #include <SDL/SDL_image.h>
-#include <SDL/SDL_rotozoom.h>
-#include"deskew.h"
+#include <SDL_rotozoom.h>
 #include <math.h>
 #include"pixeloperations.h"
-#define PRECISION 720
 
 
-SDL_Surface *man_deskew(SDL_Surface* image_surface, double degree){
+SDL_Surface *man_deskew(SDL_Surface* Surface,double Angle){
 
-	return rotozoomSurface(image_surface, degree,(double)1,(int)0);
+	/*SDL_Surface* rotatedimage= rotozoomSurface(image_surface, degree,1.0,0);
+	return rotatedimage;*/
+
+    SDL_Surface* _ret = SDL_CreateRGBSurface(Surface->flags, Surface->w, Surface->h, Surface->format->BitsPerPixel,
+        Surface->format->Rmask, Surface->format->Gmask, Surface->format->Bmask, Surface->format->Amask);
+
+	double CX = Surface->w / 2, CY = Surface->h / 2; //Center coordinates of image, or close enough.
+	double X, Y, X2, Y2;
+
+	for(int y = 0; y < Surface->h; y++) {
+        for(int x= 0; x < Surface->w; x++) {
+			X = x - CX;
+			Y = y - CY;
+			X2 = (X * cos(Angle) - Y * sin(Angle));
+			Y2 = (X * sin(Angle) + Y * cos(Angle));
+			X2 += CX;
+			Y2 += CY;
+			if( X2 >= Surface->w || X2 < 0 || Y2 >= Surface->h || Y2 < 0) put_pixel(_ret, x, y, SDL_MapRGB(Surface->format, 255, 255, 255));
+/*
+			X = x - CX;
+			Y = y - CY;
+			X2 = (X * cos(Angle) + Y * sin(Angle));
+			Y2 = (-X * sin(Angle) + Y * cos(Angle));
+			X2 += CX;
+			Y2 += CY;
+			if( X2 >= 0 && X2 < Surface->w && Y2 >= 0 && Y2 < Surface->h) put_pixel(_ret, (Uint32)X2, (Uint32)Y2, get_pixel(Surface, x, y));*/
+			else put_pixel(_ret,x,y,get_pixel(Surface,X2,Y2));
+		}
+	}
+
+	return _ret;
 }
+/*	
+	
+	size_t w = image_surface -> w;
+	size_t h = image_surface -> h;
+	//size_t new_width = cos(degree)*h + sin(degree)*w;
+	//size_t new_height = sin(degree)*h + cos(degree)*w;
+	SDL_Rect rect;
+	rect.x = 0;
+        rect.y = 0;
+        rect.w = w;
+        rect.h = h;
+	SDL_FillRect(image_surface,&rect,0xFFFFFF);
+	SDL_BlitSurface(rotatedimage, NULL, image_surface,&rect);
+	SDL_FreeSurface(rotatedimage);
+	return image_surface;
+	*/
+
+
+/*	
+	SDL_Surface* dst = SDL_CreateRGBSurface(
+0,(int)w,(int)h,
+                  rotatedimage->format->BitsPerPixel,
+                  rotatedimage->format->Bmask,rotatedimage->format->Gmask,rotatedimage->format->Bmask,rotatedimage->format->Amask);
+	//SDL_SetAlpha(dst, 0, 0);
+	if(dst == NULL)
+		printf("SDL_Init failed: %s\n", SDL_GetError());
+
+	rect.x = 0;
+	rect.y = 0;
+	rect.w = w;
+	rect.h = h;
+	SDL_DisplayFormat(rotatedimage);
+	SDL_DisplayFormat(dst);
+	SDL_BlitSurface(rotatedimage, NULL, dst,&rect);
+	return dst;
+	*/	
+
+//}
+
 
 
 
@@ -25,17 +92,25 @@ double variance(size_t arr[],size_t n)
     {
         sum = sum + arr[i];
     }
-    double average = sum / (float)n;
+    double average = sum / (double)n;
 
     for (size_t i = 0; i < n; i++)
     {
         sum1 = sum1 + pow((arr[i] - average), 2);
     }
 
-    return (sum1 / (float)n);
+    return (sum1 / (double)n);
 }
 
-double skew_deg(SDL_Surface* image){
+void init_hist (size_t arr[],size_t n){
+
+for(size_t i = 0; i<n;i++)
+{
+	arr[i] = 0;
+}
+
+}
+double skew_deg(SDL_Surface* image, float precision){
 	size_t h = image->h;
 	size_t w = image->w;
 	size_t hist[h];
@@ -44,30 +119,35 @@ double skew_deg(SDL_Surface* image){
 	double max_var = 0;
 	double max_var_deg=0;
 	double var;
+	double max = 45.;
+	double min = -45.;
 	Uint32 pixel;
-	for(size_t l=0; l<(size_t)PRECISION; l++){
-		man_deskew(image,(double)l/2.0);
+	for(; min<max; min+= precision){
+		SDL_Surface *tilted_copy = man_deskew(image,min);
 		for (size_t i=0; i<h;i++){
 			sum = 0;
 				for(size_t j=0; j<w; j++){
-					pixel = get_pixel(image,j,i);
-					SDL_GetRGB(pixel, image->format, &r, &g, &b);
+					pixel = get_pixel(tilted_copy,j,i);
+					SDL_GetRGB(pixel, tilted_copy->format, &r, &g, &b);
 					if (r== 0)
 						sum +=1;
 				}
 			hist[i]= sum;
 		}
 		var = variance(hist, h);
+		
 		if (var >max_var){
 			max_var = var;
-			max_var_deg = l *0.5;
+			max_var_deg = min;
 		}
-	}
+		SDL_FreeSurface(tilted_copy);
+		init_hist(hist,h);
+}
 	return max_var_deg;
 }
 
 SDL_Surface *auto_deskew(SDL_Surface* img)
 {
-return man_deskew(img, skew_deg(img));
+return man_deskew(img, skew_deg(img,0.25));
 
 }
