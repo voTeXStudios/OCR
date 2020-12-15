@@ -1,13 +1,12 @@
 #Start
 
 CC=gcc
-CPPFLAGS= `pkg-config --cflags sdl --cflags gtk+-3.0` -MMD -Wall -O3
-CFLAGS= -Wall -std=c99 -O3
-LDFLAGS=
+#CPPFLAGS= `pkg-config --cflags sdl --cflags gtk+-3.0` -MMD -Wall -O3
+CFLAGS= `pkg-config --cflags sdl --cflags gtk+-3.0` -MMD -Wall -O3
 LDLIBS= `pkg-config --libs sdl --libs gtk+-3.0` -lSDL_image -lm -lSDL
 all: UI_code
 
-UI_code: CropImage.o CharDetection.o BlackAndWhite.o pixeloperations.o GaussianBlur.o Network.o Layer.o Neuron.o UI_code.o sdl_libs.o deskew.o
+UI_code: CropImage.o CharDetection.o BlackAndWhite.o pixeloperations.o GaussianBlur.o Network.o Layer.o Neuron.o sdl_libs.o deskew.o
 
 CropImage.o: CropImage.h pixeloperations.h
 
@@ -26,8 +25,6 @@ Network.o: Network.h Layer.h Neuron.h pixeloperations.h sdl_libs.h
 Layer.o: Layer.h Neuron.h
 
 Neuron.o: Neuron.h
-
-UI_code.o : UI_code.c
 
 sdl_libs.o: sdl_libs.h
 

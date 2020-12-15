@@ -1,6 +1,6 @@
 #include <err.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include "SDL/SDL.h"
+#include "SDL/SDL_image.h"
 #include <stdlib.h>
 #include<stdbool.h>
 #include "pixeloperations.h"

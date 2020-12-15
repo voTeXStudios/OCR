@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include<SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include"SDL/SDL.h"
+#include "SDL/SDL_image.h"
 #include <math.h>
 #include"pixeloperations.h"
 #include"deskew.h"
