@@ -1,6 +1,5 @@
 #ifndef _NEURON_
 #define _NEURON_
-
 struct Neuron
 {
   double nb_weights;

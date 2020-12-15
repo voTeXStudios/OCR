@@ -14,7 +14,10 @@
 #include"CharDetection.h"
 #include"BlackAndWhite.h"
 #include "pixeloperations.h"
+#include "GaussianBlur.h"
+#include "deskew.h"
 #include "err.h"
+#include"sdl_libs.h"
 //Widgets
 
 GtkWidget *image;
@@ -76,21 +79,35 @@ void image_load(char * file_name)
   }
 }
 
+SDL_Surface* PreProcessing(SDL_Surface* img)
+{
+  SDL_Surface* newImage;
+  Contrast(img, 40);
+  grayScale(img);
+  Convolution(img);
+  Binarise(img);
+  newImage = ChipTheEdges(img);
+  newImage = auto_deskew(newImage);
+  return newImage;
+
+  
+}
+
 void run_program(GtkButton *Button, gpointer window)
 {
     SDL_Surface *image;
+    SDL_Surface* newImage;
     init_SDL();
     image = load_image(file_name);
     if (!image)
         errx(1, "null surface was given, try again with appropriate image");
-    grayScale(image);
-    Binarise(image);
+    newImage = PreProcessing(image);
     SDL_Surface** surfaces;
-    surfaces = DetectCharacter(image);
+    surfaces = DetectCharacter(newImage);
     int nb_characters = NbCharacters();
     text_conversion(surfaces, nb_characters);
     GtkWidget *dialog = gtk_message_dialog_new(GTK_WINDOW(window), GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE,
-      "The text has been saved in the current directory");
+      "The text has been saved in the current directory. Named as: Result");
     gtk_window_set_title(GTK_WINDOW(dialog), "Warning");
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);

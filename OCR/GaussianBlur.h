@@ -3,7 +3,7 @@
 
 #include<stdlib.h>
 #include"SDL/SDL.h"
-void Convolution(SDL_Surface *img,double kernel[9]);
+void Convolution(SDL_Surface *img);
 double gauss[9];
 double sharpen[9];
 double edge_detection[9];

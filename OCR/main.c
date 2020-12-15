@@ -12,34 +12,10 @@
 //#include"GaussianBlur.h"
 #include"Network.h"
 
-//Initialize the SDL
-/*
-void init_SDL()
-{
-    if(SDL_Init(SDL_INIT_VIDEO) == -1)
-        errx(1, "Could not initialize SDL: %s. \n", SDL_GetError());
-
-}
-*/
-
-
-
-//Load the image in the memory
-/*
-SDL_Surface* load_image(char* path)
-{
-    SDL_Surface *img;
-
-    img = IMG_Load(path);
-    if(!img)
-        errx(3, "can't load %s: %s", path, IMG_GetError());
-    return img;
-}
-*/
 
 
 //Display the image
-SDL_Surface* displayImage(SDL_Surface *img)
+/*SDL_Surface* displayImage(SDL_Surface *img)
 {
     SDL_Surface *screen;
 
@@ -87,7 +63,7 @@ void wait_for_keypressed()
 
 
 // Saves the images. This function is Temporary //
-void SaveImages(SDL_Surface** surfaces)
+/*void SaveImages(SDL_Surface** surfaces)
 {
     int i = 0;
     while (*(surfaces + i) != NULL)
@@ -99,7 +75,7 @@ void SaveImages(SDL_Surface** surfaces)
         i++;
         //train_images(*(surfaces + i));
     }
-}
+}*/
 
 
 

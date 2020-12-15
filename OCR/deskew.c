@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include<SDL/SDL.h>
 #include <SDL/SDL_image.h>
-#include <SDL_rotozoom.h>
 #include <math.h>
 #include"pixeloperations.h"
+#include"deskew.h"
 
 
 SDL_Surface *man_deskew(SDL_Surface* Surface,double Angle){

@@ -4,19 +4,14 @@
 #include<stdlib.h>
 #include<stdbool.h>
 #include<err.h>
-
-
-
-
 #include "pixeloperations.h"
 #include "CharDetection.h"
 
 
-SDL_Surface** surfaces;
+//SDL_Surface** surfaces;
 int Char;
-
 // NOT NEEDED 
-// Drawing a horizontal Line to seperate lines of the texts
+/*// Drawing a horizontal Line to seperate lines of the texts
 void DrawHorLine(SDL_Surface *image, int i)
 {
     Uint32 pixel;
@@ -42,7 +37,7 @@ void DrawVerLine(SDL_Surface *image, int x, int start, int end)
     }
     
 
-}
+}*/
 
 // This function is to provide a bit of white background to character images just to have a cleaner look // 
 SDL_Surface* IncSizeImg(SDL_Surface* image)
@@ -73,7 +68,7 @@ SDL_Surface* IncSizeImg(SDL_Surface* image)
 
 
 // Segment the characters and store them
-void CharSeg(SDL_Surface *image, int h1, int h2, int start, int end)
+void CharSeg(SDL_Surface** surfaces, SDL_Surface *image, int h1, int h2, int start, int end)
 {
     Uint8 r, g, b;
     SDL_Surface *newImage;
@@ -108,7 +103,7 @@ void CharSeg(SDL_Surface *image, int h1, int h2, int start, int end)
 
 
 // Finds Characters 
-void FindCharacters(SDL_Surface *image, int start, int end)
+void FindCharacters(SDL_Surface** surfaces, SDL_Surface *image, int start, int end)
 {
     Uint8 r, g, b;
     Uint32 pixel;
@@ -139,7 +134,7 @@ void FindCharacters(SDL_Surface *image, int start, int end)
         if (metWhiterow && metBlack)
         {
             metBlack = false;
-            CharSeg(image, start, end, y, i);
+            CharSeg(surfaces, image, start, end, y, i);
             //DrawVerLine(image, i, start, end);
         }
         
@@ -151,7 +146,7 @@ void FindCharacters(SDL_Surface *image, int start, int end)
 
 
 // Isolates lines
-void FindLineBlock(SDL_Surface *img)
+void FindLineBlock(SDL_Surface *img, SDL_Surface** surfaces)
 {
     Uint8 r, g, b;
     Uint32 pixel;
@@ -186,7 +181,7 @@ void FindLineBlock(SDL_Surface *img)
         {
             metBlack = false;
             //DrawHorLine(img, i);
-            FindCharacters(img, start, i);
+            FindCharacters(surfaces, img, start, i);
         }
         
     }
@@ -234,7 +229,7 @@ SDL_Surface** DetectCharacter(SDL_Surface *img)
     int size = img->w;
     //printf("%i\n", size);
     Char = 0;
-    surfaces = (SDL_Surface**)malloc(size * sizeof(SDL_Surface*));
+    SDL_Surface** surfaces = (SDL_Surface**)malloc(size * sizeof(SDL_Surface*));
     SDL_Surface *cImages;
     
     if (surfaces == NULL)
@@ -252,7 +247,7 @@ SDL_Surface** DetectCharacter(SDL_Surface *img)
     
     
     // Function that stores the Character Images in the global array.
-    FindLineBlock(img);
+    FindLineBlock(img, surfaces);
 
 
 

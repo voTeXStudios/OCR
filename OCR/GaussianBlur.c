@@ -97,9 +97,9 @@ void convolute(SDL_Surface* image_surface, double m[], size_t cols){
     
 }
 
-void Convolution(SDL_Surface *img,double kernel[9])
+void Convolution(SDL_Surface *img)
 {
    // SDL_Surface* s;
-    convolute(img, kernel, 3);
+    convolute(img, gauss, 3);
     //return s;
 }

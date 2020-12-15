@@ -139,32 +139,7 @@ void binarization(SDL_Surface* image_surface, float limit)
 
 
 }
-/*
-void Contrast(SDL_Surface* image_surface)
-{
-	size_t width = image_surface->w;
-	size_t height = image_surface->h;
-	Uint8 r,g,b;
-	float r1,g1,b1;
-	SDL_Surface *image_surface_copy  = SDL_ConvertSurface(image_surface, image_surface->format, SDL_SWSURFACE);
 
-	Uint32 pixel;
-for (size_t i = 0; i < height; i++)
-    {
-        for (size_t j = 0; j < width  ; j++)
-        {
-		pixel = get_pixel(image_surface_copy,j,i);
-		SDL_GetRGB(pixel, image_surface_copy->format, &r, &g, &b);
-		r1=(((((r/255.0)-0.5)*c)+0.5)*255.0);
-		g1=(((((g/255.0)-0.5)*c)+0.5)*255.0);
-		b1=(((((b/255.0)-0.5)*c)+0.5)*255.0);
-		pixel = SDL_MapRGB(image_surface->format, r1, g1, b1);
-		put_pixel(image_surface,j,i,pixel);
-	}
-    }
-}
-
-*/
 void Contrast(SDL_Surface* image_surface, int threshold){
 	// threshold goes from -100 to 100
 double contrastLevel = pow((100.0 + threshold) / 100.0, 2); 

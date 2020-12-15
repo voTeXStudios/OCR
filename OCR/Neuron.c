@@ -4,17 +4,8 @@
 #include <float.h>
 #include "math.h"
 #include <time.h>
+#include "Neuron.h"
 
-struct Neuron
-{
-  double nb_weights;
-	double *weights;
-	double bias;
-	double output;
-  double dl_wrt_curr;
-};
-
-typedef struct Neuron Neuron;
 
 double sigmoid(double x)
 {
@@ -51,7 +42,7 @@ double ProcessNeuron(double *inputs, Neuron *N)
 
 double randomnum()
 {
-  return ((double)rand() / (double)RAND_MAX) * 2.0 - 1.0;
+  return (double)rand() / (double)RAND_MAX * 2.0 - 1.0;
 }
 
 Neuron GenerateNeuron(double nb_inputs)
@@ -60,6 +51,7 @@ Neuron GenerateNeuron(double nb_inputs)
   n.nb_weights = nb_inputs;
 	n.output = 0;
   n.bias = randomnum();
+  n.dl_wrt_curr = 0;
   n.weights = calloc(nb_inputs, sizeof(double));
   double* begin = n.weights;
   for (size_t i = 0 ; i < nb_inputs; i++)
