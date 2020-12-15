@@ -3,8 +3,8 @@
 #include <signal.h>
 #include <unistd.h>
 #include <string.h>
-#include <gtk/gtk.h>
-#include <gtk/gtkx.h>
+#include "gtk/gtk.h"
+#include "gtk/gtkx.h"
 #include <math.h>
 #include <ctype.h>
 #include "Network.h"
@@ -17,7 +17,7 @@
 #include "GaussianBlur.h"
 #include "deskew.h"
 #include "err.h"
-#include"sdl_libs.h"
+#include "sdl_libs.h"
 //Widgets
 
 GtkWidget *image;

@@ -1,18 +1,15 @@
-README for the 1st Defense.
-
-Enjoy!!
-
-#When the user will type {make} on the command line. It will create two executable file, "Network" and "main". 
-
-Network:-
-
-Neural network can be trained and progress can be viewed after launching the executable.
-Merging the networks to produce a final result proved to be difficult and will be implemented fully next time around.
-This program displays the initial network and the training for each individual input.
+++++++++++++++++++++++++++++++++++++++++++++README for the Final defence.+++++++++++++++++++++++++++++++++++++++++++
 
 
+#-1- Go to the OCR/ directory.
+#-2- From here, open the terminal and type make. This command will compile all the files and outputs an executable called UI_code.
+#-3- Run the executable (always on the terminal).
+#-4- Once the program opens, you can run our program. You can select an image by clicking on the button Open. Once an image is selected , click run and the image
+will be processed. This process will output a file called Result. This file can be found in the current directory.
 
 
+#- All the images can be found here : OCR/OCR/Testing_images
 
-Line Segmentation:-
-It needs two inputs for now. One is to show character detection and the other is to show character splitting. Although character splitting isnt fully functional yet, so it will be better to give a one line text image as the 2nd argument. User can give any text image as the input for the 1st argument as it basically shows the character detection.
+ENJOY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++Arrivederci+++++++++++++++++++++++++++++++++++++++++++++++++++++

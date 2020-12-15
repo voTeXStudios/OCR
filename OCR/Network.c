@@ -46,11 +46,6 @@ double* pixel_values(SDL_Surface* img)
 //////////////////////////////////////////////////////////
 
 
-//double* FeedForwardXOR(double* input, Network net);
-//double* FeedForward(double* input, Network net);
-//void shuffle(int* array, size_t n);
-/////////
-
 /////Generates 3 layered Network ///////////
 Network GenerateNetwork()
 {
@@ -124,6 +119,7 @@ void BackPropagation(Network net, double* target, double* inputs, double* res)
         {
           dl_dw = neuron->dl_wrt_curr * sigmoid_derivative(neuron->output) * inputs[j];
           dl_db = neuron->dl_wrt_curr * sigmoid_derivative(neuron->output) * 1;
+          
           neuron->weights[j] = neuron->weights[j] - 0.2 * dl_dw;
           neuron->bias = neuron->bias - 0.2 * dl_db;
         }
@@ -191,9 +187,9 @@ char Prediction(double* result)
 void text_conversion(SDL_Surface** surfaces, int nb_characters)
 {
     Network net = GenerateNetwork();
-    read_file(net.layers[0], 80, 80*784, "data_record3/6_layer_1data");
-    read_file(net.layers[1], 80, 80*80, "data_record3/6_layer_2data");
-    read_file(net.layers[2], 52, 52*80, "data_record3/6_layer_3data");
+    read_file(net.layers[0], 80, 80*784, "training_data/11_layer_1data");
+    read_file(net.layers[1], 80, 80*80, "training_data/11_layer_2data");
+    read_file(net.layers[2], 52, 52*80, "training_data/11_layer_3data");
     //char letters[26] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
     double* temp;
     char *result = calloc(nb_characters, sizeof(char));

@@ -1,7 +1,7 @@
 #Start
 
 CC=gcc
-#CPPFLAGS= `pkg-config --cflags sdl --cflags gtk+-3.0` -MMD -Wall -O3
+#CPPFLAGS= 'pkg-config --cflags sdl --cflags gtk+-3.0' -MMD -Wall -O3
 CFLAGS= `pkg-config --cflags sdl --cflags gtk+-3.0` -MMD -Wall -O3
 LDLIBS= `pkg-config --libs sdl --libs gtk+-3.0` -lSDL_image -lm -lSDL
 all: UI_code

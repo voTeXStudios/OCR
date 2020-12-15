@@ -41,44 +41,7 @@ SDL_Surface *man_deskew(SDL_Surface* Surface,double Angle){
 
 	return _ret;
 }
-/*	
-	
-	size_t w = image_surface -> w;
-	size_t h = image_surface -> h;
-	//size_t new_width = cos(degree)*h + sin(degree)*w;
-	//size_t new_height = sin(degree)*h + cos(degree)*w;
-	SDL_Rect rect;
-	rect.x = 0;
-        rect.y = 0;
-        rect.w = w;
-        rect.h = h;
-	SDL_FillRect(image_surface,&rect,0xFFFFFF);
-	SDL_BlitSurface(rotatedimage, NULL, image_surface,&rect);
-	SDL_FreeSurface(rotatedimage);
-	return image_surface;
-	*/
 
-
-/*	
-	SDL_Surface* dst = SDL_CreateRGBSurface(
-0,(int)w,(int)h,
-                  rotatedimage->format->BitsPerPixel,
-                  rotatedimage->format->Bmask,rotatedimage->format->Gmask,rotatedimage->format->Bmask,rotatedimage->format->Amask);
-	//SDL_SetAlpha(dst, 0, 0);
-	if(dst == NULL)
-		printf("SDL_Init failed: %s\n", SDL_GetError());
-
-	rect.x = 0;
-	rect.y = 0;
-	rect.w = w;
-	rect.h = h;
-	SDL_DisplayFormat(rotatedimage);
-	SDL_DisplayFormat(dst);
-	SDL_BlitSurface(rotatedimage, NULL, dst,&rect);
-	return dst;
-	*/	
-
-//}
 
 
 

@@ -8,36 +8,9 @@
 #include "CharDetection.h"
 
 
-//SDL_Surface** surfaces;
+
 int Char;
-// NOT NEEDED 
-/*// Drawing a horizontal Line to seperate lines of the texts
-void DrawHorLine(SDL_Surface *image, int i)
-{
-    Uint32 pixel;
-    int width = image->w;
-    for (int j = 0; j < width; j++)
-    {
-        pixel = SDL_MapRGB(image->format, 255, 0, 0);
-        put_pixel(image, j, i, pixel);
-    }
-    
-}
 
-
-//Drawing vertical lines to seperate characters of the text
-void DrawVerLine(SDL_Surface *image, int x, int start, int end)
-{
-    Uint32 pixel;
-
-    for (int i = start; i <= end; i++)
-    {
-        pixel = SDL_MapRGB(image->format, 255, 0, 0);
-        put_pixel(image, x, i, pixel);
-    }
-    
-
-}*/
 
 // This function is to provide a bit of white background to character images just to have a cleaner look // 
 SDL_Surface* IncSizeImg(SDL_Surface* image)
@@ -95,9 +68,6 @@ void CharSeg(SDL_Surface** surfaces, SDL_Surface *image, int h1, int h2, int sta
     }
     *(surfaces + Char) = newImage;
     Char += 1;
-    //printf("%p        %i\n", &*(surfaces + Char), Char);
-    //printf("%s saved\n", number_str);
-    //SDL_FreeSurface(newImage);
 
 }
 
